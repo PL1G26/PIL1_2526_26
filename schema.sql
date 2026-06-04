@@ -1,0 +1,26 @@
+CREATE DATABASE IF NOT EXISTS BD_APP ;
+USE BD_APP;
+CREATE TABLE utilisateurs
+( 
+    id_1 INT PRIMARY KEY auto_increment,
+    nom VARCHAR(100) NOT NULL ,
+    prenom VARCHAR(100) NOT NULL,
+    email VARCHAR(25) UNIQUE NOT NULL ,
+    telephone VARCHAR(20) UNIQUE NOT NULL,
+    mot_de_passe VARCHAR(200) NOT NULL ,
+    filiere ENUM('IA','IM','GL','SI','SE&IoT') NOT NULL ,
+    niveau INT NOT NULL,
+    bio TEXT NULL,
+    photo_url VARCHAR(225),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
+    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+); 
+USE BD_APP;
+
+CREATE TABLE competences
+(
+   id_2 INT PRIMARY KEY AUTO_INCREMENT,
+   matiere VARCHAR(100) NOT NULL,
+   typ ENUM('fort','faible') NOT NULL
+);
+ALTER TABLE utilisateurs MODIFY email VARCHAR(150) UNIQUE NOT NULL;
