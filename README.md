@@ -29,7 +29,7 @@ Développer une solution complète qui répond aux critères suivants :
 | AKOTONOU J-D B. Exauce | Développeur Backend | API, base de données | jeandedieuakotonou@gmail.com |
 | AGO Mona | Développeur Frontend | Interface utilisateur | agom601@gmail.com |
 | HESSA I. D. Jody | Développeur Frontend | Interface utilisateur | jodyhessa@gmail.com |
-| KPENONHOUN E. H. Adorée | | QA / Testeur | Tests, documentation | hermionekpenonhoun@gmail.com |
+| KPENONHOUN E. H. Adorée | QA / Testeur | Tests, documentation | hermionekpenonhoun@gmail.com |
 
 ---
 
@@ -61,12 +61,12 @@ Développer une solution complète qui répond aux critères suivants :
 
 ```
 project-root/
-├── 📁 src/
-│   ├── 📁 backend/        # Code serveur
-│   └── 📁 frontend/       # Code client
-├── 📁 tests/              # Suite de tests
+├── 📁 backend/   # Code serveur
+│
+├── 📁 frontend/       # Code client   
+│    
 ├── 📁 docs/               # Documentation
-├── 📄 README.md           # Ce fichier
+├── 📄 README.md
 └── 📄 .gitignore
 ```
 
