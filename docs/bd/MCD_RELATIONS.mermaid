@@ -1,0 +1,124 @@
+erDiagram
+    UTILISATEURS ||--o{ COMPETENCES : "1-N : possede"
+    UTILISATEURS ||--o{ LACUNES : "1-N : a"
+    UTILISATEURS ||--o{ DISPONIBILITES : "1-N : dispose"
+    UTILISATEURS ||--o{ OFFRES : "1-N : publie"
+    UTILISATEURS ||--o{ DEMANDES : "1-N : cree"
+    UTILISATEURS ||--o{ MATCHS : "1-N : mentor"
+    UTILISATEURS ||--o{ MATCHS : "1-N : mentore"
+    UTILISATEURS ||--o{ MESSAGES : "1-N : envoie"
+    UTILISATEURS ||--o{ CONVERSATIONS : "1-N : participe_a"
+    
+    OFFRES ||--o{ MATCHS : "1-N : lie_a"
+    DEMANDES ||--o{ MATCHS : "1-N : lie_a"
+    
+    MATCHS ||--|| CONVERSATIONS : "1-1 : genere"
+    CONVERSATIONS ||--o{ MESSAGES : "1-N : contient"
+
+    %% Attributs des entités
+    UTILISATEURS {
+        int id PK
+        string nom
+        string prenom
+        string email UK
+        string telephone UK
+        string mot_de_passe
+        enum filiere
+        int niveau
+        string bio
+        string photo_url
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    COMPETENCES {
+        int id PK
+        int user_id FK
+        string matiere
+        enum niveau_maitrise
+        int experience_annees
+        string certification
+        date date_acquisition
+        timestamp created_at
+    }
+
+    LACUNES {
+        int id PK
+        int user_id FK
+        string matiere
+        enum severite
+        string raison
+        string objectif
+        enum priorite
+        date date_identification
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    DISPONIBILITES {
+        int id PK
+        int user_id FK
+        string jour
+        time heure_debut
+        time heure_fin
+        enum type
+    }
+
+    OFFRES {
+        int id PK
+        int user_id FK
+        string matieres
+        enum format
+        string description
+        int niveau_min
+        int niveau_max
+        decimal taux_horaire
+        enum statut
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    DEMANDES {
+        int id PK
+        int user_id FK
+        string matieres
+        enum format
+        string description
+        enum urgence
+        decimal budget_max
+        enum statut
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    MATCHS {
+        int id PK
+        int mentor_id FK
+        int mentore_id FK
+        int offre_id FK
+        int demande_id FK
+        decimal score_competences
+        decimal score_horaires
+        decimal score_filiere
+        decimal score_global
+        enum statut
+        string raison_rejet
+        timestamp created_at
+    }
+
+    CONVERSATIONS {
+        int id PK
+        int match_id FK "UNIQUE"
+        int user_a_id FK
+        int user_b_id FK
+        timestamp created_at
+    }
+
+    MESSAGES {
+        int id PK
+        int conversation_id FK
+        int expediteur_id FK
+        string contenu
+        boolean lu
+        timestamp created_at
+    }
