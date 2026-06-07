@@ -1,0 +1,119 @@
+# ============================================================
+# IFRI_MentorLink — .gitignore
+# Exclut les fichiers sensibles et les artefacts de build
+# ============================================================
+# pass: c6lmVEw2oq4kBzuD
+# ──── ENVIRONMENT VARIABLES ──────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# ──── PYTHON ──────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.venv/
+venv/
+ENV/
+env/
+.venv
+
+# ──── IDE & EDITORS ───────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+.vim/
+
+# ──── TESTING ─────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+.nose*
+
+# ──── DATABASE ────────────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+db.sqlite3
+/data/
+
+# ──── LOGS ────────────────────────────────────────────────────
+*.log
+logs/
+
+# ──── TEMPORARY FILES ─────────────────────────────────────────
+*.tmp
+*.bak
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# ──── OS ──────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+desktop.ini
+
+# ──── NODE (si vous utilisez npm/webpack côté build) ────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ──── FASTAPI & UVICORN ───────────────────────────────────────
+.uvicorn_cache/
+
+# ──── CACHE DIRECTORIES ──────────────────────────────────────
+.cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ──── IDE GENERATED ───────────────────────────────────────────
+.pylint
+.pylintrc
+
+# ============================================================
+# SAFETY: Fichiers à JAMAIS commiter
+# ============================================================
+# .env (contient passwords et secrets)
+# *.key (clés privées)
+# *.pem (certificats)
+# Données sensibles (emails, tokens, etc.)
+# ============================================================
