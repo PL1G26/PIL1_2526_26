@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IFRI MentorLink</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════ LANDING ═════ -->
+<div id="view-landing" class="view active">
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand" onclick="showView('view-landing')">
+      <span class="logo-dot"></span> IFRI MentorLink
+    </div>
+    <div class="navbar-links">
+      <button class="btn btn-ghost" onclick="scrollToFeatures()">Fonctionnalités</button>
+      <button class="btn btn-outline" onclick="showView('view-login')">Connexion</button>
+      <button class="btn btn-primary" onclick="showView('view-register')">S'inscrire</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="landing-hero">
+    <div>
+      <div class="hero-tag">
+        <span class="logo-dot" style="width:7px;height:7px"></span>
+        Plateforme de mentorat IFRI · UAC
+      </div>
+      <h1 class="hero-title">
+        Apprends mieux,<br>
+        <span class="accent">ensemble.</span>
+      </h1>
+      <p class="hero-desc">
+        IFRI MentorLink connecte intelligemment les étudiants : ceux qui maîtrisent une matière avec ceux qui en ont besoin. Un matching automatique, un chat en temps réel, et une progression académique boostée.
+      </p>
+      <div class="hero-cta">
+        <button class="btn btn-primary btn-lg" onclick="showView('view-register')">Rejoindre la plateforme →</button>
+        <button class="btn btn-outline btn-lg" onclick="showView('view-login')">Se connecter</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num">5</div>
+          <div class="stat-label">Filières connectées</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">15+</div>
+          <div class="stat-label">Matières disponibles</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">100</div>
+          <div class="stat-label">Score max de compatibilité</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-card-stack">
+        <!-- Match card demo -->
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <div class="avatar av-green">AM</div>
+            <div>
+              <div class="demo-name">Mona</div>
+              <div class="demo-role">L2 · IA — Mentor Python</div>
+            </div>
+            <div class="score-badge">92 pts</div>
+          </div>
+          <div class="tag-row">
+            <span class="tag tag-green">🎓 Python</span>
+            <span class="tag tag-green">SQL</span>
+            <span class="tag tag-blue">Mercredi 15h–17h</span>
+            <span class="tag tag-amber">En ligne</span>
+          </div>
+        </div>
+
+        <!-- Chat demo -->
+        <div class="demo-card" style="padding:0;overflow:hidden;">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--bg);">
+            <div class="avatar av-pink" style="width:30px;height:30px;font-size:11px;">AD</div>
+            <div style="font-weight:600;font-size:13px;">Adorée</div>
+            <span style="margin-left:auto;font-size:11px;color:var(--brand);">● En ligne</span>
+          </div>
+          <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px 12px 12px 3px;padding:8px 12px;font-size:13px;max-width:80%;">
+              Salut ! Tu es disponible samedi pour Python ?
+            </div>
+            <div style="background:var(--brand);color:white;border-radius:12px 12px 3px 12px;padding:8px 12px;font-size:13px;max-width:80%;align-self:flex-end;">
+              Oui, 14h ça te va ? 😊
+            </div>
+          </div>
+        </div>
+
+        <!-- Post demo -->
+        <div class="demo-card">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span class="tag tag-pink" style="font-size:12px;">Demande</span>
+            <span style="font-weight:700;font-size:14px;">Besoin d'aide en Algorithmique</span>
+          </div>
+          <div class="tag-row">
+            <span class="tag tag-blue">Samedi matin</span>
+            <span class="tag tag-amber">Présentiel ou en ligne</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features-section" id="features">
+    <div class="section-label">Modules</div>
+    <div class="grid-2" style="align-items:start">
+      <div>
+        <h2 class="section-title">Tout ce dont tu as besoin pour progresser</h2>
+        <p class="section-desc">Une plateforme pensée pour les étudiants de l'IFRI, avec tous les outils pour organiser, trouver et gérer ses sessions de mentorat.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">👤</div>
+          <div class="feature-title">Profil riche</div>
+          <div class="feature-desc">Déclare tes compétences maîtrisées et tes lacunes, indique ta filière et tes disponibilités.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔗</div>
+          <div class="feature-title">Matching intelligent</div>
+          <div class="feature-desc">Un algorithme calcule un score de compatibilité sur 100 pour chaque paire mentor-mentoré.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💬</div>
+          <div class="feature-title">Chat temps réel</div>
+          <div class="feature-desc">Messagerie instantanée entre mentors et mentorés, avec historique et notifications.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📝</div>
+          <div class="feature-title">Offres & demandes</div>
+          <div class="feature-desc">Publie tes offres ou demandes de mentorat par matière, format et créneaux horaires.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎓</div>
+          <div class="feature-title">Bi-rôle</div>
+          <div class="feature-desc">Sois mentor en Python et mentoré en Algèbre simultanément — chaque étudiant a les deux rôles.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-title">Sécurisé</div>
+          <div class="feature-desc">Authentification JWT, mots de passe hachés bcrypt, messagerie réservée aux matches acceptés.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="section-label">Prêt·e ?</div>
+    <h2 class="section-title">Rejoins IFRI MentorLink aujourd'hui</h2>
+    <p>Inscription gratuite. Commence à apprendre ou à enseigner dès maintenant.</p>
+    <button class="btn btn-white btn-lg" onclick="showView('view-register')">Créer mon compte →</button>
+  </section>
+
+  <footer>
+    <div>
+      <strong>IFRI MentorLink</strong> — Projet intégrateur PIL1 2025-2026
+    </div>
+    <div>IFRI / Université d'Abomey-Calavi · Cotonou</div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════ LOGIN ═════ -->
+<div id="view-login" class="view">
+  <div class="auth-wrapper">
+    <div class="auth-left">
+      <div class="auth-left-brand">
+        <span class="logo-dot"></span> IFRI MentorLink
+      </div>
+      <div class="auth-left-content">
+        <h2>Bienvenue de retour.</h2>
+        <p>Connecte-toi pour accéder à tes sessions de mentorat, tes correspondances et ta messagerie.</p>
+        <div class="auth-left-features">
+          <div class="auth-feature">
+            <div class="auth-feature-icon">🎯</div>
+            <div>Matching automatique selon tes compétences et disponibilités</div>
+          </div>
+          <div class="auth-feature">
+            <div class="auth-feature-icon">💬</div>
+            <div>Chat en temps réel avec tes mentors et mentorés</div>
+          </div>
+          <div class="auth-feature">
+            <div class="auth-feature-icon">📈</div>
+            <div>Suivi de ta progression académique</div>
+          </div>
+        </div>
+      </div>
+      <div style="color:rgba(255,255,255,0.4);font-size:12px;">© 2025-2026 IFRI / UAC</div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-form-box">
+        <h3>Se connecter</h3>
+        <p class="auth-subtitle">Pas encore de compte ? <a href="#" onclick="showView('view-register')">S'inscrire gratuitement</a></p>
+
+        <div id="login-alert" class="alert alert-error hidden">
+          ⚠️ Email ou mot de passe incorrect.
+        </div>
+
+        <div class="form-group">
+          <label>Email ou téléphone</label>
+          <input type="text" id="login-email" placeholder="prenom.nom@ifri-uac.bj">
+        </div>
+        <div class="form-group">
+          <label>Mot de passe</label>
+          <input type="password" id="login-pass" placeholder="••••••••">
+        </div>
+        <div style="text-align:right;margin-bottom:1.5rem;">
+          <a href="#" style="font-size:13px;color:var(--brand);text-decoration:none;">Mot de passe oublié ?</a>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;" onclick="doLogin()">
+          Se connecter →
+        </button>
+        <div class="form-divider">ou</div>
+        <button class="btn btn-outline" style="width:100%;justify-content:center;padding:12px;" onclick="doDemo()">
+          Accéder avec le compte démo
+        </button>
+        <div style="text-align:center;margin-top:1.5rem;">
+          <button class="btn btn-ghost btn-sm" onclick="showView('view-landing')">← Retour à l'accueil</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ REGISTER ═════ -->
+<div id="view-register" class="view">
+  <div class="auth-wrapper">
+    <div class="auth-left">
+      <div class="auth-left-brand">
+        <span class="logo-dot"></span> IFRI MentorLink
+      </div>
+      <div class="auth-left-content">
+        <h2>Commence ton parcours de mentorat.</h2>
+        <p>Rejoins des centaines d'étudiants de l'IFRI qui s'entraident pour réussir leurs examens et approfondir leurs connaissances.</p>
+        <div class="auth-left-features" style="margin-top:2rem;">
+          <div class="auth-feature">
+            <div class="auth-feature-icon">✅</div>
+            <div>Inscription 100% gratuite pour tous les étudiants IFRI</div>
+          </div>
+          <div class="auth-feature">
+            <div class="auth-feature-icon">🔄</div>
+            <div>Soit mentor ET mentoré sur la même plateforme</div>
+          </div>
+          <div class="auth-feature">
+            <div class="auth-feature-icon">⚡</div>
+            <div>Matching instantané dès ton profil complété</div>
+          </div>
+        </div>
+      </div>
+      <div style="color:rgba(255,255,255,0.4);font-size:12px;">© 2025-2026 IFRI / UAC</div>
+    </div>
+    <div class="auth-right" style="align-items:flex-start;padding-top:2rem;">
+      <div class="auth-form-box" style="max-width:480px;">
+        <h3>Créer un compte</h3>
+        <p class="auth-subtitle">Déjà inscrit·e ? <a href="#" onclick="showView('view-login')">Se connecter</a></p>
+
+        <div id="reg-alert" class="alert alert-success hidden">
+          ✅ Compte créé avec succès ! Redirection vers le tableau de bord…
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Prénom *</label>
+            <input type="text" placeholder="AGO">
+          </div>
+          <div class="form-group">
+            <label>Nom *</label>
+            <input type="text" placeholder="Mona">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Adresse email *</label>
+          <input type="email" placeholder="prenom.nom@ifri-uac.bj">
+        </div>
+        <div class="form-group">
+          <label>Numéro de téléphone *</label>
+          <input type="tel" placeholder="+229 XX XXX XXX">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Filière *</label>
+            <select>
+              <option value="">Choisir…</option>
+              <option>IA</option><option>IM</option><option>GL</option>
+              <option>SE&IoT</option><option>SI</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Niveau *</label>
+            <select>
+              <option value="">Choisir…</option>
+              <option>L1</option><option>L2</option><option>L3</option>
+              <option>M1</option><option>M2</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Mot de passe *</label>
+          <input type="password" placeholder="Minimum 8 caractères">
+        </div>
+        <div class="form-group">
+          <label>Confirmer le mot de passe *</label>
+          <input type="password" placeholder="Répète le mot de passe">
+        </div>
+        <div class="form-group">
+          <label>Bio (optionnel)</label>
+          <textarea placeholder="Décris tes centres d'intérêt académiques…" style="min-height:60px;"></textarea>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;" onclick="doRegister()">
+          Créer mon compte →
+        </button>
+        <div style="text-align:center;margin-top:1rem;">
+          <button class="btn btn-ghost btn-sm" onclick="showView('view-landing')">← Retour à l'accueil</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ DASHBOARD ═════ -->
+<div id="view-dashboard" class="view">
+  <!-- Navbar connectée -->
+  <nav class="navbar">
+    <div class="navbar-brand" onclick="switchTab('home')">
+      <span class="logo-dot"></span> IFRI MentorLink
+    </div>
+    <div class="navbar-links">
+      <span style="font-size:13px;color:var(--text2);">Bonjour, <strong id="nav-username">AGO</strong> 👋</span>
+      <button class="btn btn-ghost btn-sm" onclick="showView('view-landing')">Déconnexion</button>
+    </div>
+  </nav>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-user">
+        <div class="avatar av-green" id="sidebar-avatar">MO</div>
+        <div>
+          <div class="sidebar-user-name" id="sidebar-name">Mona</div>
+          <div class="sidebar-user-role" id="sidebar-meta">L2 · IA</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-item active" onclick="switchTab('home')" id="tab-btn-home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Tableau de bord
+        </button>
+
+        <div class="sidebar-section-label">Mon Profil</div>
+        <button class="sidebar-item" onclick="switchTab('profile')" id="tab-btn-profile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profil & Compétences
+        </button>
+
+        <div class="sidebar-section-label">Mentorat</div>
+        <button class="sidebar-item" onclick="switchTab('posts')" id="tab-btn-posts">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Mes Posts
+        </button>
+        <button class="sidebar-item" onclick="switchTab('matches')" id="tab-btn-matches">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Correspondances
+          <span class="badge-count">3</span>
+        </button>
+        <button class="sidebar-item" onclick="switchTab('chat')" id="tab-btn-chat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Messagerie
+          <span class="badge-count">2</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="dash-content">
+
+      <!-- ── TAB: HOME ── -->
+      <div id="tab-home" class="tab-content active">
+        <div class="welcome-banner">
+          <h2>Bonjour, AGO ! 👋</h2>
+          <p>Tu as <strong>3 nouvelles correspondances</strong> et <strong>2 messages</strong> non lus.</p>
+          <div class="welcome-actions">
+            <button class="btn btn-white btn-sm" onclick="switchTab('matches')">Voir mes correspondances →</button>
+            <button class="btn btn-white-outline btn-sm" onclick="switchTab('chat')">Ouvrir la messagerie</button>
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-bottom:1.5rem;">
+          <div class="metric-card">
+            <div class="metric-num">3</div>
+            <div class="metric-label">Correspondances en attente</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-num">2</div>
+            <div class="metric-label">Sessions acceptées</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-num">4</div>
+            <div class="metric-label">Posts actifs</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">📌 Mes compétences</div>
+            <div style="margin-bottom:0.75rem;">
+              <div class="skills-group-title">💪 Points forts</div>
+              <div class="tag-row">
+                <span class="tag tag-green">Python</span>
+                <span class="tag tag-green">SQL</span>
+                <span class="tag tag-green">Vue.js</span>
+              </div>
+            </div>
+            <div>
+              <div class="skills-group-title">📚 À améliorer</div>
+              <div class="tag-row">
+                <span class="tag tag-red">Algorithmique</span>
+                <span class="tag tag-red">Réseaux</span>
+              </div>
+            </div>
+            <button class="btn btn-outline btn-sm" style="margin-top:1rem;" onclick="switchTab('profile')">Modifier le profil →</button>
+          </div>
+          <div class="card">
+            <div class="card-title">🕐 Prochaines disponibilités</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div class="avail-item">
+                <span class="day">Mercredi</span>
+                <span class="time">14h00 — 17h00</span>
+              </div>
+              <div class="avail-item">
+                <span class="day">Samedi</span>
+                <span class="time">09h00 — 12h00</span>
+              </div>
+              <div class="avail-item">
+                <span class="day">Dimanche</span>
+                <span class="time">15h00 — 18h00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:1.5rem;">
+          <div class="card-title">🔥 Top correspondances du moment</div>
+          <div id="home-matches-preview"></div>
+        </div>
+      </div>
+
+      <!-- ── TAB: PROFILE ── -->
+      <div id="tab-profile" class="tab-content">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Mon Profil</div>
+            <div class="page-subtitle">Infos personnelles, compétences et disponibilités</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveProfile()">💾 Enregistrer</button>
+        </div>
+
+        <div id="profile-alert" class="alert alert-success hidden">✅ Profil mis à jour !</div>
+
+        <div class="grid-2">
+          <!-- Infos de base -->
+          <div class="card">
+            <div class="card-title">Informations personnelles</div>
+            <div class="profile-photo-area">
+              <div class="profile-photo-big" id="profile-photo-big">AM</div>
+              <div>
+                <button class="btn btn-outline btn-sm" style="margin-bottom:6px;">📷 Changer la photo</button>
+                <div style="font-size:12px;color:var(--text3);">JPG, PNG · max 2 Mo</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Prénom</label>
+                <input type="text" value="Mona" id="pf-prenom">
+              </div>
+              <div class="form-group">
+                <label>Nom</label>
+                <input type="text" value="AGO" id="pf-nom">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" value="mona.ago@ifri-uac.bj">
+            </div>
+            <div class="form-group">
+              <label>Téléphone</label>
+              <input type="tel" value="+229 96 78 11 51">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Filière</label>
+                <select>
+                  <option>IA</option><option>IM</option><option>GL</option><option>SE&IoT</option><option>SI</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Niveau</label>
+                <select>
+                  <option>L1</option><option selected>L2</option><option>L3</option><option>M1</option><option>M2</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Bio</label>
+              <textarea>Passionné de data science et de développement web. Disponible pour aider en Python et SQL.</textarea>
+            </div>
+          </div>
+
+          <!-- Skills & Dispos -->
+          <div style="display:flex;flex-direction:column;gap:1.5rem;">
+            <div class="card">
+              <div class="card-title">🎓 Compétences</div>
+              <div class="skills-group">
+                <div class="skills-group-title">💪 Points forts — je peux enseigner</div>
+                <div class="skills-grid" id="strong-skills">
+                  <div class="skill-chip"><span>Python</span><button class="skill-chip-remove" onclick="removeSkill(this,'strong','Python')">×</button></div>
+                  <div class="skill-chip"><span>SQL</span><button class="skill-chip-remove" onclick="removeSkill(this,'strong','SQL')">×</button></div>
+                  <div class="skill-chip"><span>Vue.js</span><button class="skill-chip-remove" onclick="removeSkill(this,'strong','Vue.js')">×</button></div>
+                </div>
+              </div>
+              <div class="skills-group">
+                <div class="skills-group-title" style="color:#993556;">📚 Lacunes — j'ai besoin d'aide</div>
+                <div class="skills-grid" id="weak-skills">
+                  <div class="skill-chip" style="border-color:#F4C0D1;"><span>Algorithmique</span><button class="skill-chip-remove" onclick="removeSkill(this,'weak','Algorithmique')">×</button></div>
+                  <div class="skill-chip" style="border-color:#F4C0D1;"><span>Réseaux</span><button class="skill-chip-remove" onclick="removeSkill(this,'weak','Réseaux')">×</button></div>
+                </div>
+              </div>
+              <div class="add-skill-row">
+                <select id="skill-to-add">
+                  <option value="">Choisir une matière…</option>
+                  <option>Algorithmique</option>
+                  <option>Structures de données</option>
+                  <option>Programmation Python</option>
+                  <option>Développement Web</option>
+                  <option>JavaScript</option>
+                  <option>Vue.js</option>
+                  <option>Bases de données SQL</option>
+                  <option>Algèbre relationnelle</option>
+                  <option>Réseaux informatiques</option>
+                  <option>Linux</option>
+                  <option>Mathématiques discrètes</option>
+                  <option>Intelligence Artificielle</option>
+                  <option>FastAPI / Flask</option>
+                </select>
+                <select id="skill-type" class="type-select">
+                  <option value="strong">Point fort 💪</option>
+                  <option value="weak">Lacune 📚</option>
+                </select>
+                <button class="btn btn-primary btn-sm" onclick="addSkill()">+ Ajouter</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">🕐 Disponibilités</div>
+              <div class="avail-list" id="avail-list">
+                <div class="avail-item"><span class="day">Mercredi</span><span class="time">14h00 — 17h00</span><button class="btn btn-ghost btn-sm" onclick="removeAvail(this)">×</button></div>
+                <div class="avail-item"><span class="day">Samedi</span><span class="time">09h00 — 12h00</span><button class="btn btn-ghost btn-sm" onclick="removeAvail(this)">×</button></div>
+                <div class="avail-item"><span class="day">Dimanche</span><span class="time">15h00 — 18h00</span><button class="btn btn-ghost btn-sm" onclick="removeAvail(this)">×</button></div>
+              </div>
+              <div class="avail-add-form">
+                <div>
+                  <label style="font-size:11px;">Jour</label>
+                  <select id="avail-day" style="border-radius:var(--radius);">
+                    <option>Lundi</option><option>Mardi</option><option selected>Mercredi</option>
+                    <option>Jeudi</option><option>Vendredi</option><option>Samedi</option><option>Dimanche</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:11px;">Début</label>
+                  <input type="time" id="avail-start" value="08:00" style="border-radius:var(--radius);">
+                </div>
+                <div>
+                  <label style="font-size:11px;">Fin</label>
+                  <input type="time" id="avail-end" value="10:00" style="border-radius:var(--radius);">
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="addAvail()" style="align-self:flex-end;">+ Ajouter</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: POSTS ── -->
+      <div id="tab-posts" class="tab-content">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Mes Posts</div>
+            <div class="page-subtitle">Offres et demandes de mentorat publiées</div>
+          </div>
+          <button class="btn btn-primary" onclick="openPostForm()">+ Nouveau post</button>
+        </div>
+
+        <div class="filter-bar">
+          <span style="font-size:13px;font-weight:500;color:var(--text2);">Filtrer :</span>
+          <div class="filter-chip active" onclick="filterPosts('all',this)">Tous</div>
+          <div class="filter-chip" onclick="filterPosts('offer',this)">Offres</div>
+          <div class="filter-chip" onclick="filterPosts('request',this)">Demandes</div>
+        </div>
+
+        <div id="posts-list">
+          <!-- Posts injectés par JS -->
+        </div>
+      </div>
+
+      <!-- ── TAB: MATCHES ── -->
+      <div id="tab-matches" class="tab-content">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Correspondances</div>
+            <div class="page-subtitle">Résultats de l'algorithme de matching</div>
+          </div>
+          <div class="filter-bar" style="margin:0;">
+            <div class="filter-chip active" onclick="filterMatches('all',this)">Toutes</div>
+            <div class="filter-chip" onclick="filterMatches('pending',this)">En attente</div>
+            <div class="filter-chip" onclick="filterMatches('accepted',this)">Acceptées</div>
+            <div class="filter-chip" onclick="filterMatches('rejected',this)">Refusées</div>
+          </div>
+        </div>
+        <div id="matches-list"></div>
+      </div>
+
+      <!-- ── TAB: CHAT ── -->
+      <div id="tab-chat" class="tab-content">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Messagerie</div>
+            <div class="page-subtitle">Conversations avec tes mentors et mentorés</div>
+          </div>
+        </div>
+        <div class="chat-layout">
+          <!-- Conversation list -->
+          <div class="conv-list">
+            <div class="conv-list-header">💬 Conversations</div>
+            <div id="conv-list-items"></div>
+          </div>
+          <!-- Chat area -->
+          <div class="chat-area" id="chat-area">
+            <div class="chat-placeholder">
+              <div class="chat-placeholder-icon">💬</div>
+              <h4>Sélectionne une conversation</h4>
+              <p style="font-size:13px;margin-top:0.5rem;">Tes conversations actives s'affichent à gauche.<br>La messagerie est disponible pour les matches acceptés.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ═══ POST FORM MODAL ═══ -->
+<div id="post-form-modal" class="post-form-modal hidden">
+  <div class="post-form-box">
+    <h3>📝 Nouveau post</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Type *</label>
+        <select id="post-type">
+          <option value="offer">Offre — je peux aider</option>
+          <option value="request">Demande — j'ai besoin d'aide</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Matière *</label>
+        <select id="post-skill">
+          <option value="">Choisir…</option>
+          <option>Algorithmique</option><option>Python</option><option>SQL</option>
+          <option>JavaScript</option><option>Vue.js</option><option>Réseaux</option>
+          <option>Linux</option><option>Mathématiques discrètes</option><option>Intelligence Artificielle</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Format *</label>
+      <select id="post-mode">
+        <option value="online">En ligne</option>
+        <option value="offline">Présentiel</option>
+        <option value="both">Les deux</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Description (optionnel)</label>
+      <textarea id="post-desc" placeholder="Ex : Je propose des sessions de 2h sur Python pour les débutants…" style="min-height:80px;"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Créneaux horaires *</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:end;">
+        <select id="pm-day"><option>Lundi</option><option>Mardi</option><option>Mercredi</option><option>Jeudi</option><option>Vendredi</option><option>Samedi</option><option>Dimanche</option></select>
+        <input type="time" id="pm-start" value="14:00">
+        <input type="time" id="pm-end" value="17:00">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closePostForm()">Annuler</button>
+      <button class="btn btn-primary" onclick="submitPost()">Publier le post</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── STATE ───
+const state = {
+  posts: [
+    { id:1, type:'offer', skill:'Python', mode:'online', desc:'Sessions débutants, 2h par séance. Exercices pratiques.', day:'Mercredi', start:'14:00', end:'16:00', active:true },
+    { id:2, type:'offer', skill:'SQL', mode:'both', desc:'Modélisation BDD, requêtes avancées.', day:'Samedi', start:'10:00', end:'12:00', active:true },
+    { id:3, type:'request', skill:'Algorithmique', mode:'both', desc:'Besoin d\'aide pour les algo de tri et graphes.', day:'Dimanche', start:'15:00', end:'17:00', active:true },
+    { id:4, type:'request', skill:'Réseaux', mode:'online', desc:'Cours sur TCP/IP et les protocoles.', day:'Samedi', start:'14:00', end:'16:00', active:true },
+  ],
+  matches: [
+    { id:1, name:'Adorée', initials:'AD', color:'av-pink', field:'GL', level:'L3', skill:'Algorithmique', score:85, days:'Samedi, Dimanche', mode:'En ligne', status:'pending' },
+    { id:2, name:'Jody', initials:'JD', color:'av-blue', field:'IA', level:'L2', skill:'Réseaux', score:70, days:'Dimanche', mode:'Présentiel', status:'pending' },
+    { id:3, name:'Jean De Dieu', initials:'JD', color:'av-amber', field:'IM', level:'L1', skill:'Algorithmique', score:55, days:'Samedi', mode:'Les deux', status:'pending' },
+    { id:4, name:'Dels Marcel', initials:'DM', color:'av-green', field:'GL', level:'L2', skill:'Python', score:92, days:'Mercredi', mode:'En ligne', status:'accepted' },
+    { id:5, name:'Estebania', initials:'ET', color:'av-blue', field:'SI', level:'L3', skill:'Python', score:60, days:'Vendredi', mode:'En ligne', status:'rejected' },
+  ],
+  conversations: [
+    { id:1, matchId:4, name:'Dels Marcel', initials:'DM', color:'av-green', preview:'Super, à mercredi !', time:'14:32', unread:0,
+      messages: [
+        { sent:false, text:'Salut Mona ! Je suis disponible mercredi pour la session Python.', time:'14:28' },
+        { sent:true,  text:'Parfait ! On se retrouve à 14h en ligne alors ?', time:'14:30' },
+        { sent:false, text:'Super, à mercredi !', time:'14:32' },
+      ]
+    },
+    { id:2, matchId:4, name:'Adorée', initials:'AD', color:'av-pink', preview:'Tu peux m\'expliquer les arbres binaires ?', time:'Hier', unread:2,
+      messages: [
+        { sent:false, text:'Bonjour ! Notre match a été accepté, super 🎉', time:'Hier 09:15' },
+        { sent:true,  text:'Oui, contente de t\'avoir comme mentor ! On commence quand ?', time:'Hier 10:00' },
+        { sent:false, text:'Tu peux m\'expliquer les arbres binaires ?', time:'Hier 10:05' },
+      ]
+    },
+  ],
+  currentConv: null,
+  postFilter: 'all',
+  matchFilter: 'all',
+};
+
+// ─── NAVIGATION ───
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  const btn = document.getElementById('tab-btn-'+tab);
+  if(btn) btn.classList.add('active');
+}
+
+function scrollToFeatures() {
+  document.getElementById('features').scrollIntoView({behavior:'smooth'});
+}
+
+// ─── AUTH ───
+function doLogin() {
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-pass').value;
+  if(!email || !pass) { showAlert('login-alert','error','⚠️ Remplis tous les champs.'); return; }
+  if(email.includes('@') || email.length > 3) { launchDashboard('AGO','Mona','L2','IA'); }
+  else { showAlert('login-alert','error','⚠️ Email ou mot de passe incorrect.'); }
+}
+function doDemo() { launchDashboard('AGO','Mona','L2','IA'); }
+function doRegister() {
+  const al = document.getElementById('reg-alert');
+  al.className = 'alert alert-success';
+  al.textContent = '✅ Compte créé avec succès ! Redirection en cours…';
+  al.classList.remove('hidden');
+  setTimeout(() => launchDashboard('AGO','Mona','L2','IA'), 1200);
+}
+function launchDashboard(prenom, nom, level, field) {
+  document.getElementById('nav-username').textContent = prenom;
+  document.getElementById('sidebar-name').textContent = prenom+' '+nom;
+  document.getElementById('sidebar-meta').textContent = level+' · '+field;
+  document.getElementById('sidebar-avatar').textContent = prenom[0]+nom[0];
+  document.getElementById('profile-photo-big').textContent = prenom[0]+nom[0];
+  renderPosts();
+  renderMatches();
+  renderHomeMatchPreview();
+  renderConversations();
+  showView('view-dashboard');
+  switchTab('home');
+}
+
+// ─── PROFILE ───
+function saveProfile() {
+  const al = document.getElementById('profile-alert');
+  al.className = 'alert alert-success'; al.textContent = '✅ Profil mis à jour avec succès !';
+  al.classList.remove('hidden');
+  setTimeout(() => al.classList.add('hidden'), 3000);
+}
+function addSkill() {
+  const name = document.getElementById('skill-to-add').value;
+  const type = document.getElementById('skill-type').value;
+  if(!name) return;
+  const container = document.getElementById(type+'-skills');
+  const chip = document.createElement('div');
+  chip.className = 'skill-chip';
+  chip.style.borderColor = type === 'weak' ? '#F4C0D1' : '';
+  chip.innerHTML = `<span>${name}</span><button class="skill-chip-remove" onclick="removeSkill(this,'${type}','${name}')">×</button>`;
+  container.appendChild(chip);
+  document.getElementById('skill-to-add').value = '';
+}
+function removeSkill(btn) { btn.parentElement.remove(); }
+function addAvail() {
+  const day = document.getElementById('avail-day').value;
+  const start = document.getElementById('avail-start').value;
+  const end = document.getElementById('avail-end').value;
+  if(!day||!start||!end) return;
+  const list = document.getElementById('avail-list');
+  const item = document.createElement('div');
+  item.className = 'avail-item';
+  item.innerHTML = `<span class="day">${day}</span><span class="time">${start} — ${end}</span><button class="btn btn-ghost btn-sm" onclick="removeAvail(this)">×</button>`;
+  list.appendChild(item);
+}
+function removeAvail(btn) { btn.parentElement.remove(); }
+
+// ─── POSTS ───
+function renderPosts() {
+  const container = document.getElementById('posts-list');
+  const filtered = state.postFilter === 'all' ? state.posts : state.posts.filter(p => p.type === state.postFilter);
+  if(filtered.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📝</div><h4>Aucun post</h4><p>Crée ton premier post pour commencer.</p></div>`;
+    return;
+  }
+  container.innerHTML = filtered.map(p => `
+    <div class="post-card">
+      <div class="post-card-header">
+        <div>
+          <span class="post-type-badge ${p.type==='offer'?'post-offer':'post-request'}">${p.type==='offer'?'Offre':'Demande'}</span>
+          <div class="post-card-skill" style="margin-top:6px;">${p.skill}</div>
+        </div>
+        <div class="post-card-actions">
+          <button class="btn btn-outline btn-sm">✏️ Modifier</button>
+          <button class="btn btn-danger btn-sm" onclick="deletePost(${p.id})">🗑 Supprimer</button>
+        </div>
+      </div>
+      ${p.desc ? `<div class="post-card-desc">${p.desc}</div>` : ''}
+      <div class="post-card-meta">
+        <span>📅 ${p.day} · ${p.start}–${p.end}</span>
+        <span>📍 ${p.mode === 'online' ? 'En ligne' : p.mode === 'offline' ? 'Présentiel' : 'En ligne / Présentiel'}</span>
+        <span style="color:var(--brand);font-weight:500;">● Actif</span>
+      </div>
+    </div>
+  `).join('');
+}
+function filterPosts(type, el) {
+  state.postFilter = type;
+  document.querySelectorAll('#tab-posts .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderPosts();
+}
+function deletePost(id) {
+  state.posts = state.posts.filter(p => p.id !== id);
+  renderPosts();
+}
+function openPostForm() { document.getElementById('post-form-modal').classList.remove('hidden'); }
+function closePostForm() { document.getElementById('post-form-modal').classList.add('hidden'); }
+function submitPost() {
+  const type = document.getElementById('post-type').value;
+  const skill = document.getElementById('post-skill').value;
+  const mode = document.getElementById('post-mode').value;
+  const desc = document.getElementById('post-desc').value;
+  const day = document.getElementById('pm-day').value;
+  const start = document.getElementById('pm-start').value;
+  const end = document.getElementById('pm-end').value;
+  if(!skill) { alert('Choisis une matière.'); return; }
+  state.posts.push({ id: Date.now(), type, skill, mode, desc, day, start, end, active:true });
+  closePostForm();
+  renderPosts();
+}
+
+// ─── MATCHES ───
+function renderMatches(filterStatus) {
+  const status = filterStatus || state.matchFilter;
+  const container = document.getElementById('matches-list');
+  const filtered = status === 'all' ? state.matches : state.matches.filter(m => m.status === status);
+  if(filtered.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔗</div><h4>Aucune correspondance</h4><p>L'algorithme de matching calculera tes correspondances automatiquement.</p></div>`;
+    return;
+  }
+  container.innerHTML = filtered.map(m => {
+    const pct = m.score;
+    const actions = m.status === 'pending'
+      ? `<button class="btn btn-primary btn-sm" onclick="acceptMatch(${m.id})">✅ Accepter</button>
+         <button class="btn btn-danger btn-sm" onclick="rejectMatch(${m.id})">✕ Refuser</button>`
+      : m.status === 'accepted'
+      ? `<span class="match-accepted-badge">✅ Accepté</span>
+         <button class="btn btn-outline btn-sm" onclick="switchTab('chat')">💬 Message</button>`
+      : `<span class="match-rejected-badge">✕ Refusé</span>`;
+    return `
+    <div class="match-card" id="match-card-${m.id}">
+      <div class="match-card-header">
+        <div class="avatar ${m.color}" style="width:48px;height:48px;font-size:16px;">${m.initials}</div>
+        <div class="match-card-info">
+          <div class="match-user-name">${m.name}</div>
+          <div class="match-user-meta">${m.level} · ${m.field} · Mentor pour <strong>${m.skill}</strong></div>
+        </div>
+        <div class="match-score-ring" style="--score:${pct}">
+          <div class="match-score-inner">${m.score}</div>
+        </div>
+      </div>
+      <div class="match-details">
+        <div class="match-detail-item">
+          <div class="match-detail-label">Matière</div>
+          <div class="match-detail-value">📚 ${m.skill}</div>
+        </div>
+        <div class="match-detail-item">
+          <div class="match-detail-label">Disponibilités communes</div>
+          <div class="match-detail-value">📅 ${m.days}</div>
+        </div>
+        <div class="match-detail-item">
+          <div class="match-detail-label">Format</div>
+          <div class="match-detail-value">📍 ${m.mode}</div>
+        </div>
+      </div>
+      <div class="match-actions">${actions}</div>
+    </div>`;
+  }).join('');
+}
+function renderHomeMatchPreview() {
+  const container = document.getElementById('home-matches-preview');
+  const top3 = state.matches.filter(m=>m.status==='pending').slice(0,3);
+  if(top3.length===0){ container.innerHTML='<p style="color:var(--text3);font-size:13px;">Aucune correspondance en attente.</p>'; return; }
+  container.innerHTML = top3.map(m=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
+      <div class="avatar ${m.color}" style="width:36px;height:36px;font-size:13px;">${m.initials}</div>
+      <div style="flex:1;"><div style="font-weight:600;font-size:14px;">${m.name}</div><div style="font-size:12px;color:var(--text3);">Mentor pour ${m.skill}</div></div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;color:var(--brand-dark);font-size:14px;">${m.score} pts</div>
+      <button class="btn btn-outline btn-sm" onclick="switchTab('matches')">Voir →</button>
+    </div>
+  `).join('');
+}
+function filterMatches(status, el) {
+  state.matchFilter = status;
+  document.querySelectorAll('#tab-matches .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderMatches(status);
+}
+function acceptMatch(id) {
+  state.matches.find(m=>m.id===id).status = 'accepted';
+  renderMatches();
+  renderHomeMatchPreview();
+  const badge = document.querySelector('.sidebar-item #badge-matches');
+  // update badge count
+  const pending = state.matches.filter(m=>m.status==='pending').length;
+  document.querySelectorAll('.sidebar-item .badge-count')[0].textContent = pending;
+}
+function rejectMatch(id) {
+  state.matches.find(m=>m.id===id).status = 'rejected';
+  renderMatches();
+  renderHomeMatchPreview();
+  const pending = state.matches.filter(m=>m.status==='pending').length;
+  document.querySelectorAll('.sidebar-item .badge-count')[0].textContent = pending;
+}
+
+// ─── CHAT ───
+function renderConversations() {
+  const container = document.getElementById('conv-list-items');
+  container.innerHTML = state.conversations.map(c => `
+    <div class="conv-item ${state.currentConv===c.id?'active':''}" onclick="openConv(${c.id})">
+      <div class="avatar ${c.color}" style="width:36px;height:36px;font-size:13px;">${c.initials}</div>
+      <div class="conv-item-info">
+        <div class="conv-item-name">${c.name}</div>
+        <div class="conv-item-preview">${c.preview}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+        <div class="conv-item-time">${c.time}</div>
+        ${c.unread > 0 ? `<div class="unread-dot"></div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+function openConv(id) {
+  state.currentConv = id;
+  const conv = state.conversations.find(c=>c.id===id);
+  conv.unread = 0;
+  renderConversations();
+  const area = document.getElementById('chat-area');
+  area.innerHTML = `
+    <div class="chat-header">
+      <div class="avatar ${conv.color}" style="width:38px;height:38px;font-size:13px;">${conv.initials}</div>
+      <div class="chat-header-info">
+        <div class="chat-header-name">${conv.name}</div>
+        <div class="chat-header-sub"><span class="chat-online-dot"></span>En ligne · Match accepté</div>
+      </div>
+    </div>
+    <div class="chat-messages" id="chat-msgs">
+      ${conv.messages.map(m=>`
+        <div class="msg ${m.sent?'sent':'received'}">
+          ${!m.sent ? `<div class="avatar ${conv.color}" style="width:28px;height:28px;font-size:10px;flex-shrink:0;">${conv.initials}</div>` : ''}
+          <div>
+            <div class="msg-time" style="text-align:${m.sent?'right':'left'}">${m.time}</div>
+            <div class="msg-bubble">${m.text}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="chat-input-area">
+      <textarea id="chat-input" placeholder="Écris ton message…" rows="1" onkeydown="handleEnter(event,${id})"></textarea>
+      <button class="chat-send-btn" onclick="sendMsg(${id})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  `;
+  // update unread badge
+  const totalUnread = state.conversations.reduce((sum,c)=>sum+c.unread,0);
+  document.querySelectorAll('.sidebar-item .badge-count')[1].textContent = totalUnread || 0;
+  scrollToBottom();
+}
+function sendMsg(convId) {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text) return;
+  const conv = state.conversations.find(c=>c.id===convId);
+  const now = new Date();
+  const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+  conv.messages.push({ sent:true, text, time });
+  conv.preview = text;
+  conv.time = time;
+  input.value = '';
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = 'msg sent';
+  div.innerHTML = `<div><div class="msg-time" style="text-align:right">${time}</div><div class="msg-bubble">${text}</div></div>`;
+  msgs.appendChild(div);
+  scrollToBottom();
+  // Simulate response
+  setTimeout(() => simulateReply(convId, conv), 1200);
+}
+function simulateReply(convId, conv) {
+  const replies = [
+    'Super ! Ça marche pour moi 👍',
+    'D\'accord, on se retrouve à cet horaire !',
+    'Parfait, j\'ai noté ça dans mon agenda.',
+    'Merci beaucoup ! À bientôt 😊',
+    'Je prépare les exercices de mon côté.',
+  ];
+  const text = replies[Math.floor(Math.random()*replies.length)];
+  const now = new Date();
+  const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+  conv.messages.push({ sent:false, text, time });
+  conv.preview = text;
+  const msgs = document.getElementById('chat-msgs');
+  if(msgs) {
+    const div = document.createElement('div');
+    div.className = 'msg received';
+    div.innerHTML = `
+      <div class="avatar ${conv.color}" style="width:28px;height:28px;font-size:10px;flex-shrink:0;">${conv.initials}</div>
+      <div><div class="msg-time">${time}</div><div class="msg-bubble">${text}</div></div>`;
+    msgs.appendChild(div);
+    scrollToBottom();
+  }
+  renderConversations();
+}
+function handleEnter(e, convId) {
+  if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(convId); }
+}
+function scrollToBottom() {
+  const msgs = document.getElementById('chat-msgs');
+  if(msgs) msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ─── UTILS ───
+function showAlert(id, type, msg) {
+  const el = document.getElementById(id);
+  el.className = `alert alert-${type}`;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 4000);
+}
+</script>
+</body>
+</html>
