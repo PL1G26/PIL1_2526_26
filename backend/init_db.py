@@ -35,6 +35,7 @@ def init_db():
     # 2. Create tables
     logger.info("\n2️⃣  Creating database tables...")
     try:
+        import models
         create_all_tables()
         logger.info("✓ Database tables created successfully")
     except Exception as e:
@@ -78,7 +79,7 @@ def init_db():
             ]
             
             for skill in skills_data:
-                db.execute(text(f"INSERT INTO skills (name) VALUES ('{skill}')"))
+                db.execute(text("INSERT INTO skills (name) VALUES (:name)"), {"name": skill})
             
             db.commit()
             logger.info(f"✓ Inserted {len(skills_data)} skills")
