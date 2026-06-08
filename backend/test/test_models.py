@@ -3,6 +3,10 @@
 # backend/test_models.py
 # ============================================================
 
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 from database import SessionLocal
 from models import User, Skill, MentorshipPost, Match, Conversation, Message
 
