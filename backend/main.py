@@ -53,19 +53,19 @@ async def root():
         "environment": settings.env,
     }
 
-# ──── ROUTER IMPORTS (À AJOUTER QUAND LES ROUTERS SONT PRÊTS) ─
-# from backend.routers import auth, users, skills, posts, matches, chat
+# ──── ROUTER IMPORTS ──────────────────────────────────────────
+from routers import auth, chat, users, skills, posts, matches
 
-# app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
-# app.include_router(users.router, prefix="/api/users", tags=["Users"])
-# app.include_router(skills.router, prefix="/api/skills", tags=["Skills"])
-# app.include_router(posts.router, prefix="/api/posts", tags=["Mentorship Posts"])
-# app.include_router(matches.router, prefix="/api/matches", tags=["Matching"])
-# app.include_router(chat.router, prefix="/api", tags=["Chat"])
+app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
+app.include_router(users.router, prefix="/api/users", tags=["Users"])
+app.include_router(skills.router, prefix="/api/skills", tags=["Skills"])
+app.include_router(posts.router, prefix="/api/posts", tags=["Mentorship Posts"])
+app.include_router(matches.router, prefix="/api/matches", tags=["Matching"])
+app.include_router(chat.router, prefix="/api", tags=["Chat"])
 
 # ──── EXCEPTION HANDLING ─────────────────────────────────────
 @app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
+async def global_exception_handler(request, exc : Exception):
     """Gestionnaire global des exceptions"""
     logger.error(f"Exception: {exc}", exc_info=True)
     return JSONResponse(
