@@ -17,7 +17,13 @@
       <span class="logo-dot"></span> IFRI MentorLink
     </div>
     <div class="navbar-links">
+      <button class="btn btn-ghost" onclick="scrollToAbout()">À propos</button>
       <button class="btn btn-ghost" onclick="scrollToFeatures()">Fonctionnalités</button>
+      <button class="btn btn-ghost" onclick="scrollToTestimonials()">Témoignages</button>
+      <button class="btn btn-ghost" onclick="scrollToContact()">Contactez-nous</button>
+      <button class="btn btn-ghost btn-icon-only" onclick="toggleDarkMode()" title="Mode sombre" id="dark-toggle-landing">
+        <svg id="dark-icon-landing" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
       <button class="btn btn-outline" onclick="showView('view-login')">Connexion</button>
       <button class="btn btn-primary" onclick="showView('view-register')">S'inscrire</button>
     </div>
@@ -109,6 +115,13 @@
     </div>
   </section>
 
+  <section class="features-section" id="about" style="background:var(--surface2); border-bottom: none;">
+    <div class="section-label">À propos</div>
+    <h2 class="section-title">Qu'est-ce que IFRI MentorLink ?</h2>
+    <p class="section-desc" style="max-width:800px; margin-bottom:0;">
+      IFRI MentorLink est une plateforme innovante dédiée aux étudiants de l'Institut de Formation et de Recherche en Informatique (IFRI). Conçue pour favoriser l'entraide académique, elle permet de mettre en relation les étudiants excellant dans certaines matières avec ceux souhaitant s'améliorer. Grâce à un algorithme de matching intelligent, un système de chat en temps réel et une gestion simplifiée des disponibilités, MentorLink transforme la réussite individuelle en un succès collectif.
+    </p>
+  </section>
   
   <section class="features-section" id="features">
     <div class="section-label">Modules</div>
@@ -161,30 +174,36 @@
     
     <div class="testimonial-form-box">
       <div class="testimonial-form-header">
-        <div class="avatar av-green" style="width:40px;height:40px;font-size:14px;">?</div>
+        <div class="avatar av-green" style="width:40px;height:40px;font-size:14px;" id="testi-avatar-icon">?</div>
         <div>
           <div style="font-weight:600;font-size:14px;">Ton témoignage</div>
           <div style="font-size:12px;color:var(--text3);">Partage ton expérience de mentorat</div>
         </div>
       </div>
-      <div class="form-group" style="margin-bottom:0.75rem;">
-        <input type="text" id="testi-name" placeholder="Ton prénom et filière (ex: Mona · L2 IA)" style="font-size:14px;">
-      </div>
-      <div class="form-group" style="margin-bottom:0.75rem;">
-        <textarea id="testi-text" placeholder="Raconte ton expérience de mentorat sur IFRI MentorLink…" style="min-height:90px;font-size:14px;resize:vertical;"></textarea>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-        <div style="display:flex;gap:6px;align-items:center;">
-          <span style="font-size:13px;color:var(--text2);">Note :</span>
-          <div id="star-rating" style="display:flex;gap:2px;">
-            <span class="star" data-val="1" onclick="setRating(1)">★</span>
-            <span class="star" data-val="2" onclick="setRating(2)">★</span>
-            <span class="star" data-val="3" onclick="setRating(3)">★</span>
-            <span class="star" data-val="4" onclick="setRating(4)">★</span>
-            <span class="star" data-val="5" onclick="setRating(5)">★</span>
-          </div>
+      <div id="testi-login-notice" style="text-align:center;padding:1rem 0;">
+        <p style="color:var(--text2);font-size:14px;margin-bottom:0.75rem;">🔒 Connecte-toi pour publier un témoignage.</p>
+        <div style="display:flex;gap:0.75rem;justify-content:center;">
+          <button class="btn btn-primary btn-sm" onclick="showView('view-login')">Se connecter</button>
+          <button class="btn btn-outline btn-sm" onclick="showView('view-register')">S'inscrire</button>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="publishTestimonial()" style="margin-left:auto;">Publier mon témoignage →</button>
+      </div>
+      <div id="testi-form-fields" style="display:none;">
+        <div class="form-group" style="margin-bottom:0.75rem;">
+          <textarea id="testi-text" placeholder="Raconte ton expérience de mentorat sur IFRI MentorLink…" style="min-height:90px;font-size:14px;resize:vertical;"></textarea>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div style="display:flex;gap:6px;align-items:center;">
+            <span style="font-size:13px;color:var(--text2);">Note :</span>
+            <div id="star-rating" style="display:flex;gap:2px;">
+              <span class="star" data-val="1" onclick="setRating(1)">★</span>
+              <span class="star" data-val="2" onclick="setRating(2)">★</span>
+              <span class="star" data-val="3" onclick="setRating(3)">★</span>
+              <span class="star" data-val="4" onclick="setRating(4)">★</span>
+              <span class="star" data-val="5" onclick="setRating(5)">★</span>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="publishTestimonial()" style="margin-left:auto;">Publier mon témoignage →</button>
+        </div>
       </div>
       <div id="testi-alert" class="alert alert-success hidden" style="margin-top:0.75rem;margin-bottom:0;"></div>
     </div>
@@ -195,7 +214,16 @@
     </div>
   </section>
 
-  
+  <section class="cta-section" id="contact" style="background:var(--surface); color:var(--text); border-top:1px solid var(--border);">
+    <div class="section-label">Contactez-nous</div>
+    <h2 class="section-title" style="color:var(--text);">Besoin d'aide ou une suggestion ?</h2>
+    <p style="color:var(--text2); max-width:600px; margin:0 auto 2.5rem auto;">Notre équipe technique est à ton écoute pour toute question ou suggestion d'amélioration pour la plateforme.</p>
+    <div style="display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap;">
+      <a href="mailto:support@ifri-uac.bj" class="btn btn-outline btn-lg" style="text-decoration:none;">✉️ support@ifri-uac.bj</a>
+      <a href="tel:+22900000000" class="btn btn-primary btn-lg" style="text-decoration:none;">📞 +229 00 00 00 00</a>
+    </div>
+  </section>
+
   <section class="cta-section">
     <div class="section-label">Prêt·e ?</div>
     <h2 class="section-title">Rejoins IFRI MentorLink aujourd'hui</h2>
@@ -375,7 +403,10 @@
     </div>
     <div class="navbar-links">
       <span style="font-size:13px;color:var(--text2);">Bonjour, <strong id="nav-username"></strong> 👋</span>
-      <button class="btn btn-ghost btn-sm" onclick="showView('view-landing')">Déconnexion</button>
+      <button class="btn btn-ghost btn-icon-only" onclick="toggleDarkMode()" title="Mode sombre" id="dark-toggle-dash">
+        <svg id="dark-icon-dash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Déconnexion</button>
     </div>
   </nav>
 
@@ -402,6 +433,10 @@
         </button>
 
         <div class="sidebar-section-label">Mentorat</div>
+        <button class="sidebar-item" onclick="switchTab('search')" id="tab-btn-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Rechercher des matières
+        </button>
         <button class="sidebar-item" onclick="switchTab('posts')" id="tab-btn-posts">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           Mes Posts
@@ -491,6 +526,27 @@
           <div class="card-title">🔥 Top correspondances du moment</div>
           <div id="home-matches-preview"></div>
         </div>
+
+        <div class="card" style="margin-top:1.5rem; border-left: 4px solid var(--brand);">
+          <div class="card-title">💬 Partage ton expérience</div>
+          <p style="font-size:13px; color:var(--text2); margin-bottom:1rem;">Ton témoignage aide la communauté à grandir et encourage le mentorat entre étudiants.</p>
+          <textarea id="dash-testi-text" placeholder="Comment IFRI MentorLink t'a aidé cette semaine ?" style="width:100%; min-height:80px; margin-bottom:1rem;"></textarea>
+          
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; gap:6px; align-items:center;">
+              <span style="font-size:13px; color:var(--text2);">Note :</span>
+              <div id="dash-star-rating" style="display:flex;gap:2px; font-size:20px;">
+                <span class="dash-star" data-val="1" onclick="setDashRating(1)" style="cursor:pointer; color:#d1d5db;">★</span>
+                <span class="dash-star" data-val="2" onclick="setDashRating(2)" style="cursor:pointer; color:#d1d5db;">★</span>
+                <span class="dash-star" data-val="3" onclick="setDashRating(3)" style="cursor:pointer; color:#d1d5db;">★</span>
+                <span class="dash-star" data-val="4" onclick="setDashRating(4)" style="cursor:pointer; color:#d1d5db;">★</span>
+                <span class="dash-star" data-val="5" onclick="setDashRating(5)" style="cursor:pointer; color:#d1d5db;">★</span>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="publishDashTestimonial()">Publier mon témoignage →</button>
+          </div>
+        </div>
+
       </div>
 
       
@@ -575,20 +631,26 @@
               </div>
               <div class="add-skill-row">
                 <select id="skill-to-add">
-                  <option value="">Choisir une matière…</option>
+                  <option value="">Choisir…</option>
                   <option>Algorithmique</option>
-                  <option>Structures de données</option>
-                  <option>Programmation Python</option>
-                  <option>Développement Web</option>
-                  <option>JavaScript</option>
-                  <option>Vue.js</option>
-                  <option>Bases de données SQL</option>
-                  <option>Algèbre relationnelle</option>
-                  <option>Réseaux informatiques</option>
-                  <option>Linux</option>
-                  <option>Mathématiques discrètes</option>
-                  <option>Intelligence Artificielle</option>
-                  <option>FastAPI / Flask</option>
+                  <option>Algèbre linéaires et applications</option>
+                  <option>Analyse combinatoire, calcul des probabilités et applications</option>
+                  <option>Analyse et applications</option>
+                  <option>Déontologie et droits d'auteur</option>
+                  <option>Developpement web</option>
+                  <option>Equations différentielles et calcul intégral</option>
+                  <option>Infographie</option>
+                  <option>Langage C</option>
+                  <option>Logique, arithmétique et ses applications</option>
+                  <option>Outils de base en informatique</option>
+                  <option>Programmation</option>
+                  <option>Programmation python</option>
+                  <option>Projet intégrateur</option>
+                  <option>Statistiques inférentielles et applications</option>
+                  <option>Suit aux langages</option>
+                  <option>Techniques d'expression écrite et orale</option>
+                  <option>Theorie des bases de données et algèbre relationnelle</option>
+                  <option>Theorie des graphes et application numérique</option>
                 </select>
                 <select id="skill-type" class="type-select">
                   <option value="strong">Point fort 💪</option>
@@ -626,6 +688,30 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <div id="tab-search" class="tab-content">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Rechercher des matières</div>
+            <div class="page-subtitle">Trouve un mentor ou propose ton aide sur une matière</div>
+          </div>
+        </div>
+
+        <div class="search-bar-row">
+          <div class="search-input-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="search-input" placeholder="Rechercher une matière (ex: Python, SQL, Réseaux…)" oninput="renderSearchResults()" style="padding-left:42px;">
+          </div>
+          <div class="filter-bar" style="margin:0;gap:8px;">
+            <span style="font-size:13px;font-weight:500;color:var(--text2);">Rôle :</span>
+            <div class="filter-chip active" onclick="setSearchFilter('all',this)" id="sf-all">Tous</div>
+            <div class="filter-chip" onclick="setSearchFilter('mentor',this)" id="sf-mentor">🎓 Je veux être mentor</div>
+            <div class="filter-chip" onclick="setSearchFilter('mentoré',this)" id="sf-mentore">📚 Je cherche un mentor</div>
+          </div>
+        </div>
+
+        <div id="search-results" class="search-results-grid"></div>
       </div>
 
       
@@ -711,9 +797,25 @@
         <label>Matière *</label>
         <select id="post-skill">
           <option value="">Choisir…</option>
-          <option>Algorithmique</option><option>Python</option><option>SQL</option>
-          <option>JavaScript</option><option>Vue.js</option><option>Réseaux</option>
-          <option>Linux</option><option>Mathématiques discrètes</option><option>Intelligence Artificielle</option>
+          <option>Algorithmique</option>
+          <option>Algèbre linéaires et applications</option>
+          <option>Analyse combinatoire, calcul des probabilités et applications</option>
+          <option>Analyse et applications</option>
+          <option>Déontologie et droits d'auteur</option>
+          <option>Developpement web</option>
+          <option>Equations différentielles et calcul intégral</option>
+          <option>Infographie</option>
+          <option>Langage C</option>
+          <option>Logique, arithmétique et ses applications</option>
+          <option>Outils de base en informatique</option>
+          <option>Programmation</option>
+          <option>Programmation python</option>
+          <option>Projet intégrateur</option>
+          <option>Statistiques inférentielles et applications</option>
+          <option>Suit aux langages</option>
+          <option>Techniques d'expression écrite et orale</option>
+          <option>Theorie des bases de données et algèbre relationnelle</option>
+          <option>Theorie des graphes et application numérique</option>
         </select>
       </div>
     </div>
