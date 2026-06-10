@@ -1,24 +1,24 @@
-# Définition des Entités — IFRI_MentorLink (Version 2)
-## Modèle Conceptuel de Données (MCD) — Architecture dissociée
+# Définition des Entités — IFRI_MentorLink (Version 3)
+## Modèle Conceptuel de Données (MCD) — Architecture unifiée
 
 ---
 
 ## 📋 Table des matières
 
-1. [Entité Utilisateurs](#entité-utilisateurs)
-2. [Entité Compétences](#entité-compétences)
-3. [Entité Lacunes](#entité-lacunes)
-4. [Entité Disponibilités](#entité-disponibilités)
-5. [Entité Offres](#entité-offres)
-6. [Entité Demandes](#entité-demandes)
-7. [Entité Matchs](#entité-matchs)
-8. [Entité Conversations](#entité-conversations)
-9. [Entité Messages](#entité-messages)
-10. [Relations entre entités](#relations-entre-entités)
+1. [Entité users](#entité-users)
+2. [Entité skills](#entité-skills)
+3. [Entité user_skills](#entité-user_skills)
+4. [Entité user_availabilities](#entité-user_availabilities)
+5. [Entité mentorship_posts](#entité-mentorship_posts)
+6. [Entité post_availabilities](#entité-post_availabilities)
+7. [Entité matches](#entité-matches)
+8. [Entité conversations](#entité-conversations)
+9. [Entité messages](#entité-messages)
+10. [Diagramme des relations](#diagramme-des-relations-mcd)
 
 ---
 
-## Entité : UTILISATEURS
+## Entité : users
 
 **Description** : Représente chaque utilisateur de la plateforme (étudiants IFRI).
 
@@ -26,303 +26,155 @@
 
 | Attribut | Type | Contrainte | Description |
 |----------|------|-----------|-------------|
-| `id` | INT | PRIMARY KEY, AUTO_INCREMENT | Identifiant unique de l'utilisateur |
-| `nom` | VARCHAR(100) | NOT NULL | Nom de famille de l'utilisateur |
-| `prenom` | VARCHAR(100) | NOT NULL | Prénom de l'utilisateur |
+| `id` | SERIAL | PRIMARY KEY | Identifiant unique de l'utilisateur |
+| `first_name` | VARCHAR(50) | NOT NULL | Prénom de l'utilisateur |
+| `last_name` | VARCHAR(50) | NOT NULL | Nom de famille de l'utilisateur |
 | `email` | VARCHAR(100) | UNIQUE, NOT NULL | Adresse e-mail unique de l'utilisateur |
-| `telephone` | VARCHAR(20) | UNIQUE, NOT NULL | Numéro de téléphone unique |
-| `mot_de_passe` | VARCHAR(255) | NOT NULL | Hash bcrypt du mot de passe (jamais en clair) |
-| `filiere` | ENUM | NOT NULL | Filière : 'IA', 'IM', 'GL', 'SE&IoT', 'SI' |
-| `niveau` | INT | NOT NULL | Année d'étude : 1, 2, 3, etc. |
+| `phone_number` | VARCHAR(20) | UNIQUE, NOT NULL | Numéro de téléphone unique |
+| `password_hash` | VARCHAR(255) | NOT NULL | Hash du mot de passe |
+| `profile_photo` | VARCHAR(255) | NULL | URL vers la photo de profil |
+| `field_of_study` | VARCHAR(50) | NOT NULL | Filière : 'IA', 'IM', 'GL', 'SE&IoT', 'SI' |
+| `level` | VARCHAR(20) | NOT NULL | Niveau d'étude : 'L1', 'L2', 'L3', 'M1', 'M2' |
 | `bio` | TEXT | NULL | Courte biographie / présentation personnelle |
-| `photo_url` | VARCHAR(255) | NULL | Chemin vers la photo de profil |
-| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Date/heure de création du compte |
-| `updated_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Date/heure de dernière modification |
-
-### Exemple d'enregistrement
-
-```
-id: 1
-nom: Martin
-prenom: Alice
-email: alice.martin@ifri.edu
-telephone: +229 12345678
-mot_de_passe: $2y$10$abcdef... (bcrypt hash)
-filiere: IA
-niveau: 2
-bio: Passionnée par l'intelligence artificielle
-photo_url: /uploads/alice_martin.jpg
-created_at: 2026-06-02 14:30:00
-updated_at: 2026-06-02 14:30:00
-```
+| `created_at` | TIMESTAMP | DEFAULT NOW() | Date/heure de création du compte |
+| `updated_at` | TIMESTAMP | DEFAULT NOW() | Date/heure de dernière modification |
 
 ---
 
-## Entité : COMPÉTENCES
+## Entité : skills
 
-**Description** : Représente les matières/domaines que l'utilisateur maîtrise (points forts).
+**Description** : Représente les matières ou compétences disponibles dans le système.
 
 ### Attributs
 
 | Attribut | Type | Contrainte | Description |
 |----------|------|-----------|-------------|
-| `id` | INT | PRIMARY KEY, AUTO_INCREMENT | Identifiant unique de la compétence |
-| `user_id` | INT | FOREIGN KEY (utilisateurs.id), NOT NULL | Lien vers l'utilisateur propriétaire |
-| `matiere` | VARCHAR(100) | NOT NULL | Nom de la matière maîtrisée (ex: 'Python', 'Maths', 'Algorithmique') |
-| `niveau_maitrise` | ENUM | DEFAULT 'intermediaire' | Niveau de maîtrise : 'debutant', 'intermediaire', 'avance', 'expert' |
-| `experience_annees` | INT | NULL | Nombre d'années d'expérience (optionnel) |
-| `certification` | VARCHAR(255) | NULL | Certification ou qualification possédée (optionnel) |
-| `date_acquisition` | DATE | NULL | Date d'acquisition de la compétence |
-| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Date/heure d'ajout de la compétence au profil |
-
-### Contraintes supplémentaires
-
-- **UNIQUE KEY** : `(user_id, matiere)` — Un utilisateur ne peut avoir qu'une seule entrée par matière
-- **ON DELETE CASCADE** : Si l'utilisateur est supprimé, ses compétences sont supprimées
-- **INDEX** : `(user_id)` pour optimiser les recherches par utilisateur
-
-### Exemple d'enregistrements
-
-```
-id: 1, user_id: 1, matiere: 'Python', niveau_maitrise: 'expert', experience_annees: 3, certification: NULL, date_acquisition: 2023-06-15, created_at: 2026-06-02 14:30:00
-
-id: 2, user_id: 1, matiere: 'JavaScript', niveau_maitrise: 'avance', experience_annees: 2, certification: NULL, date_acquisition: 2024-01-10, created_at: 2026-06-02 14:30:00
-
-id: 3, user_id: 1, matiere: 'Algorithmique', niveau_maitrise: 'intermediaire', experience_annees: 1, certification: NULL, date_acquisition: 2025-09-01, created_at: 2026-06-02 14:30:00
-```
+| `id` | SERIAL | PRIMARY KEY | Identifiant unique de la compétence |
+| `name` | VARCHAR(255) | UNIQUE, NOT NULL | Nom de la compétence (ex: 'Python', 'Mathématiques') |
+| `created_at` | TIMESTAMP | DEFAULT NOW() | Date d'ajout de la compétence |
 
 ---
 
-## Entité : LACUNES
+## Entité : user_skills
 
-**Description** : Représente les matières/domaines où l'utilisateur a besoin d'aide (points faibles).
+**Description** : Représente les compétences maîtrisées (points forts) ou les lacunes (points faibles) d'un utilisateur.
 
 ### Attributs
 
 | Attribut | Type | Contrainte | Description |
 |----------|------|-----------|-------------|
-| `id` | INT | PRIMARY KEY, AUTO_INCREMENT | Identifiant unique de la lacune |
-| `user_id` | INT | FOREIGN KEY (utilisateurs.id), NOT NULL | Lien vers l'utilisateur concerné |
-| `matiere` | VARCHAR(100) | NOT NULL | Nom de la matière à améliorer (ex: 'Mathématiques', 'Physique') |
-| `severite` | ENUM | NOT NULL | Sévérité de la lacune : 'legere', 'moderee', 'severe' |
-| `raison` | TEXT | NULL | Raison/contexte de la lacune (ex: "J'ai manqué des cours", "C'est ma première fois en ML") |
-| `objectif` | VARCHAR(255) | NULL | Objectif souhaité (ex: "Passer le prochain contrôle", "Comprendre les bases") |
-| `priorite` | ENUM | DEFAULT 'normal' | Priorité : 'basse', 'normal', 'haute' |
-| `date_identification` | DATE | NOT NULL | Date où la lacune a été identifiée |
-| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Date/heure d'ajout au profil |
-| `updated_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Dernière modification |
+| `user_id` | INT | FOREIGN KEY, PK | Lien vers l'utilisateur |
+| `skill_id` | INT | FOREIGN KEY, PK | Lien vers la compétence |
+| `proficiency` | VARCHAR(10) | NOT NULL | Niveau de maîtrise : 'strong' (peut enseigner) ou 'weak' (a besoin d'aide) |
 
 ### Contraintes supplémentaires
-
-- **UNIQUE KEY** : `(user_id, matiere)` — Un utilisateur ne peut avoir qu'une seule entrée par matière
-- **ON DELETE CASCADE** : Si l'utilisateur est supprimé, ses lacunes sont supprimées
-- **INDEX** : `(user_id, priorite)` pour les recherches par urgence
-
-### Exemple d'enregistrements
-
-```
-id: 1, user_id: 2, matiere: 'Mathématiques', severite: 'moderee', raison: 'Difficultés avec les dérivées', objectif: 'Réussir le prochain DS', priorite: 'haute', date_identification: 2026-04-15, created_at: 2026-06-02 15:00:00, updated_at: 2026-06-02 15:00:00
-
-id: 2, user_id: 2, matiere: 'Physique', severite: 'legere', raison: 'Besoin de consolider les bases', objectif: 'Comprendre la mécanique', priorite: 'normal', date_identification: 2026-05-01, created_at: 2026-06-02 15:05:00, updated_at: 2026-06-02 15:05:00
-
-id: 3, user_id: 2, matiere: 'Base de données SQL', severite: 'severe', raison: 'Première approche de SQL', objectif: 'Maîtriser les jointures et les requêtes complexes', priorite: 'haute', date_identification: 2026-05-20, created_at: 2026-06-02 15:10:00, updated_at: 2026-06-02 15:10:00
-```
+- **PRIMARY KEY** : `(user_id, skill_id)`
+- **ON DELETE CASCADE** : Supprimé si l'utilisateur ou la compétence est supprimé.
 
 ---
 
-## Entité : DISPONIBILITÉS
+## Entité : user_availabilities
 
-**Description** : Représente les créneaux horaires disponibles pour le mentorat de chaque utilisateur.
+**Description** : Représente les disponibilités horaires habituelles de l'utilisateur.
 
 ### Attributs
 
 | Attribut | Type | Contrainte | Description |
 |----------|------|-----------|-------------|
-| `id` | INT | PRIMARY KEY, AUTO_INCREMENT | Identifiant unique de la disponibilité |
-| `user_id` | INT | FOREIGN KEY (utilisateurs.id), NOT NULL | Lien vers l'utilisateur |
-| `jour` | VARCHAR(20) | NOT NULL | Jour de la semaine : 'lundi', 'mardi', ..., 'dimanche' |
-| `heure_debut` | TIME | NOT NULL | Heure de début du créneau (format HH:MM:SS) |
-| `heure_fin` | TIME | NOT NULL | Heure de fin du créneau (format HH:MM:SS) |
-| `type` | ENUM | DEFAULT 'regulier' | Type : 'regulier' (récurrent) ou 'ponctuel' (une seule fois) |
+| `id` | SERIAL | PRIMARY KEY | Identifiant unique |
+| `user_id` | INT | FOREIGN KEY, NOT NULL | Lien vers l'utilisateur |
+| `day_of_week` | VARCHAR(10) | NOT NULL | Jour de la semaine (ex: 'Monday', etc.) |
+| `start_time` | TIME | NOT NULL | Heure de début |
+| `end_time` | TIME | NOT NULL | Heure de fin |
 
 ### Contraintes supplémentaires
-
-- **ON DELETE CASCADE** : Si l'utilisateur est supprimé, ses disponibilités sont supprimées
-- **Validation logique** : `heure_fin` > `heure_debut`
-
-### Exemple d'enregistrements
-
-```
-id: 1, user_id: 1, jour: 'lundi', heure_debut: 18:00:00, heure_fin: 20:00:00, type: 'regulier'
-id: 2, user_id: 1, jour: 'mercredi', heure_debut: 19:00:00, heure_fin: 21:00:00, type: 'regulier'
-id: 3, user_id: 1, jour: 'jeudi', heure_debut: 17:00:00, heure_fin: 19:00:00, type: 'regulier'
-id: 4, user_id: 2, jour: 'lundi', heure_debut: 15:00:00, heure_fin: 17:00:00, type: 'regulier'
-```
+- **CHECK** : `start_time < end_time`
+- **ON DELETE CASCADE** : Lié à `users`.
 
 ---
 
-## Entité : OFFRES
+## Entité : mentorship_posts
 
-**Description** : Représente les offres de mentorat publiées par un utilisateur (je peux aider).
+**Description** : Représente les offres (je peux aider) et demandes (j'ai besoin d'aide) de mentorat publiées.
 
 ### Attributs
 
 | Attribut | Type | Contrainte | Description |
 |----------|------|-----------|-------------|
-| `id` | INT | PRIMARY KEY, AUTO_INCREMENT | Identifiant unique de l'offre |
-| `user_id` | INT | FOREIGN KEY (utilisateurs.id), NOT NULL | Lien vers l'utilisateur mentor qui propose |
-| `matieres` | VARCHAR(500) | NOT NULL | Matières concernées (format JSON ou CSV) |
-| `format` | ENUM | NOT NULL | Format proposé : 'presentiel', 'ligne', 'les_deux' |
-| `description` | TEXT | NULL | Description détaillée de l'offre (expertise, approche pédagogique, etc.) |
-| `niveau_min` | INT | NULL | Niveau minimum des mentorés (ex: 1 pour niveau 1 et 2) |
-| `niveau_max` | INT | NULL | Niveau maximum des mentorés (ex: 2 pour niveaux 1 et 2) |
-| `taux_horaire` | DECIMAL(8,2) | NULL | Taux horaire proposé (optionnel, 0 si gratuit) |
-| `statut` | ENUM | DEFAULT 'active' | Statut : 'active' ou 'inactive' |
-| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Date/heure de création de l'offre |
-| `updated_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Date/heure de dernière modification |
-
-### Contraintes supplémentaires
-
-- **INDEX** sur `(user_id, statut)` pour les recherches optimisées
-- **ON DELETE CASCADE** : Si l'utilisateur est supprimé, ses offres sont supprimées
-
-### Exemple d'enregistrement
-
-```
-id: 1
-user_id: 1
-matieres: '["Python", "Algorithmique"]'
-format: 'ligne'
-description: 'Je peux vous aider en Python et Algorithmique. Approche basée sur des exercices pratiques. Disponible pour les niveaux 1 et 2.'
-niveau_min: 1
-niveau_max: 2
-taux_horaire: 0.00
-statut: 'active'
-created_at: 2026-06-03 10:00:00
-updated_at: 2026-06-03 10:00:00
-```
+| `id` | SERIAL | PRIMARY KEY | Identifiant unique du post |
+| `user_id` | INT | FOREIGN KEY, NOT NULL | Lien vers l'utilisateur |
+| `type` | VARCHAR(10) | NOT NULL | 'offer' (offre) ou 'request' (demande) |
+| `skill_id` | INT | FOREIGN KEY, NOT NULL | Lien vers la compétence concernée |
+| `mode` | VARCHAR(10) | NOT NULL | Format : 'online', 'offline', ou 'both' |
+| `description` | TEXT | NULL | Description détaillée |
+| `is_active` | BOOLEAN | DEFAULT TRUE | TRUE si actif, FALSE si archivé |
+| `created_at` | TIMESTAMP | DEFAULT NOW() | Date de création |
+| `updated_at` | TIMESTAMP | DEFAULT NOW() | Dernière modification |
 
 ---
 
-## Entité : DEMANDES
+## Entité : post_availabilities
 
-**Description** : Représente les demandes de mentorat publiées par un utilisateur (j'ai besoin d'aide).
+**Description** : Représente les disponibilités horaires spécifiques à un post de mentorat.
 
 ### Attributs
 
 | Attribut | Type | Contrainte | Description |
 |----------|------|-----------|-------------|
-| `id` | INT | PRIMARY KEY, AUTO_INCREMENT | Identifiant unique de la demande |
-| `user_id` | INT | FOREIGN KEY (utilisateurs.id), NOT NULL | Lien vers l'utilisateur mentoré qui demande |
-| `matieres` | VARCHAR(500) | NOT NULL | Matières pour lesquelles l'aide est demandée (JSON ou CSV) |
-| `format` | ENUM | NOT NULL | Format préféré : 'presentiel', 'ligne', 'les_deux' |
-| `description` | TEXT | NULL | Description détaillée de la demande (difficultés spécifiques, objectifs, etc.) |
-| `urgence` | ENUM | DEFAULT 'normal' | Urgence : 'basse', 'normal', 'haute' |
-| `budget_max` | DECIMAL(8,2) | NULL | Budget maximum disposé à payer (optionnel) |
-| `statut` | ENUM | DEFAULT 'active' | Statut : 'active' ou 'resolue' |
-| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Date/heure de création de la demande |
-| `updated_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Date/heure de dernière modification |
+| `id` | SERIAL | PRIMARY KEY | Identifiant unique |
+| `post_id` | INT | FOREIGN KEY, NOT NULL | Lien vers le post |
+| `day_of_week` | VARCHAR(10) | NOT NULL | Jour de la semaine |
+| `start_time` | TIME | NOT NULL | Heure de début |
+| `end_time` | TIME | NOT NULL | Heure de fin |
 
 ### Contraintes supplémentaires
-
-- **INDEX** sur `(user_id, statut, urgence)` pour les recherches optimisées
-- **ON DELETE CASCADE** : Si l'utilisateur est supprimé, ses demandes sont supprimées
-
-### Exemple d'enregistrement
-
-```
-id: 1
-user_id: 2
-matieres: '["Mathématiques", "Physique"]'
-format: 'presentiel'
-description: 'J\'ai besoin d\'aide pour comprendre les dérivées en Maths et la mécanique en Physique. Je suis libre les jeudis et dimanches.'
-urgence: 'haute'
-budget_max: 50.00
-statut: 'active'
-created_at: 2026-06-03 11:30:00
-updated_at: 2026-06-03 11:30:00
-```
+- **CHECK** : `start_time < end_time`
+- **ON DELETE CASCADE** : Lié à `mentorship_posts`.
 
 ---
 
-## Entité : MATCHS
+## Entité : matches
 
-**Description** : Représente les appairements mentor-mentoré proposés par l'algorithme.
+**Description** : Représente les correspondances mentor ↔ mentoré calculées par l'algorithme.
 
 ### Attributs
 
 | Attribut | Type | Contrainte | Description |
 |----------|------|-----------|-------------|
-| `id` | INT | PRIMARY KEY, AUTO_INCREMENT | Identifiant unique du match |
-| `mentor_id` | INT | FOREIGN KEY (utilisateurs.id), NOT NULL | ID du mentor (celui qui aide) |
-| `mentore_id` | INT | FOREIGN KEY (utilisateurs.id), NOT NULL | ID du mentoré (celui qui reçoit l'aide) |
-| `offre_id` | INT | FOREIGN KEY (offres.id), NOT NULL | Lien vers l'offre du mentor |
-| `demande_id` | INT | FOREIGN KEY (demandes.id), NOT NULL | Lien vers la demande du mentoré |
-| `score_competences` | DECIMAL(5,2) | NULL | Score de compatibilité des compétences (0-100) |
-| `score_horaires` | DECIMAL(5,2) | NULL | Score de compatibilité des horaires (0-100) |
-| `score_filiere` | DECIMAL(5,2) | NULL | Score de proximité filière/niveau (0-100) |
-| `score_global` | DECIMAL(5,2) | NULL | Score global de compatibilité (0-100) |
-| `statut` | ENUM | DEFAULT 'propose' | Statut : 'propose', 'accepte', 'rejete', 'en_cours', 'termine' |
-| `raison_rejet` | TEXT | NULL | Raison du rejet (si applicable) |
-| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Date/heure de création du match |
+| `id` | SERIAL | PRIMARY KEY | Identifiant unique du match |
+| `mentor_id` | INT | FOREIGN KEY, NOT NULL | ID de l'utilisateur mentor |
+| `mentee_id` | INT | FOREIGN KEY, NOT NULL | ID de l'utilisateur mentoré |
+| `offer_post_id`| INT | FOREIGN KEY, NULL | Lien vers le post d'offre |
+| `request_post_id`| INT | FOREIGN KEY, NULL | Lien vers le post de demande |
+| `skill_id` | INT | FOREIGN KEY, NULL | Compétence concernée |
+| `score` | DECIMAL(5,2)| DEFAULT 0 | Score de compatibilité |
+| `status` | VARCHAR(20) | DEFAULT 'pending' | 'pending', 'accepted', 'rejected' |
+| `created_at` | TIMESTAMP | DEFAULT NOW() | Date de création |
 
 ### Contraintes supplémentaires
-
-- **UNIQUE KEY** : `(mentor_id, mentore_id)` — Un seul match entre deux utilisateurs
-- **INDEX** sur `(mentor_id, statut)`, `(mentore_id, statut)` pour les recherches
-- **ON DELETE CASCADE** : Suppression en cascade
-
-### Exemple d'enregistrement
-
-```
-id: 1
-mentor_id: 1
-mentore_id: 2
-offre_id: 1
-demande_id: 1
-score_competences: 90.00
-score_horaires: 85.00
-score_filiere: 75.00
-score_global: 85.33
-statut: 'accepte'
-raison_rejet: NULL
-created_at: 2026-06-03 12:00:00
-```
+- **CHECK** : `mentor_id != mentee_id`
 
 ---
 
-## Entité : CONVERSATIONS
+## Entité : conversations
 
-**Description** : Représente les conversations de messagerie entre deux utilisateurs matchés.
+**Description** : Représente une conversation de messagerie créée après l'acceptation d'un match.
 
 ### Attributs
 
 | Attribut | Type | Contrainte | Description |
 |----------|------|-----------|-------------|
-| `id` | INT | PRIMARY KEY, AUTO_INCREMENT | Identifiant unique de la conversation |
-| `match_id` | INT | FOREIGN KEY (matchs.id), NOT NULL UNIQUE | Lien vers le match associé |
-| `user_a_id` | INT | FOREIGN KEY (utilisateurs.id), NOT NULL | ID du premier utilisateur |
-| `user_b_id` | INT | FOREIGN KEY (utilisateurs.id), NOT NULL | ID du second utilisateur |
-| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Date/heure de création de la conversation |
+| `id` | SERIAL | PRIMARY KEY | Identifiant unique |
+| `match_id` | INT | FOREIGN KEY, UNIQUE, NOT NULL | Lien vers le match associé |
+| `created_at` | TIMESTAMP | DEFAULT NOW() | Date de création |
+| `updated_at` | TIMESTAMP | DEFAULT NOW() | Dernière modification |
 
 ### Contraintes supplémentaires
-
-- **ON DELETE CASCADE** : Si un utilisateur ou un match est supprimé, la conversation est supprimée
-- **UNIQUE KEY** : `match_id` — Une seule conversation par match
-
-### Exemple d'enregistrement
-
-```
-id: 1
-match_id: 1
-user_a_id: 1
-user_b_id: 2
-created_at: 2026-06-03 12:30:00
-```
+- **ON DELETE CASCADE** : Lié à `matches`.
 
 ---
 
-## Entité : MESSAGES
+## Entité : messages
 
 **Description** : Représente les messages échangés dans une conversation.
 
@@ -330,93 +182,30 @@ created_at: 2026-06-03 12:30:00
 
 | Attribut | Type | Contrainte | Description |
 |----------|------|-----------|-------------|
-| `id` | INT | PRIMARY KEY, AUTO_INCREMENT | Identifiant unique du message |
-| `conversation_id` | INT | FOREIGN KEY (conversations.id), NOT NULL | Lien vers la conversation |
-| `expediteur_id` | INT | FOREIGN KEY (utilisateurs.id), NOT NULL | ID de l'utilisateur qui envoie |
-| `contenu` | TEXT | NOT NULL | Contenu du message (texte) |
-| `lu` | BOOLEAN | DEFAULT FALSE | Statut : FALSE (non lu) ou TRUE (lu) |
-| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Date/heure d'envoi du message |
-
-### Contraintes supplémentaires
-
-- **INDEX** sur `(conversation_id, created_at)` pour optimiser les recherches
-- **ON DELETE CASCADE** : Si la conversation est supprimée, ses messages sont supprimés
-
-### Exemple d'enregistrements
-
-```
-id: 1
-conversation_id: 1
-expediteur_id: 1
-contenu: 'Bonjour ! Je peux t'aider en Python. Quand es-tu disponible ?'
-lu: TRUE
-created_at: 2026-06-03 13:00:00
-
----
-
-id: 2
-conversation_id: 1
-expediteur_id: 2
-contenu: 'Salut Alice ! Je suis libre jeudi soir après 19h. Ça te convient ?'
-lu: TRUE
-created_at: 2026-06-03 13:05:00
-```
+| `id` | SERIAL | PRIMARY KEY | Identifiant unique du message |
+| `conversation_id`| INT | FOREIGN KEY, NOT NULL | Lien vers la conversation |
+| `sender_id` | INT | FOREIGN KEY, NOT NULL | Lien vers l'expéditeur (users) |
+| `content` | TEXT | NOT NULL | Contenu du message |
+| `is_read` | BOOLEAN | DEFAULT FALSE | Statut de lecture |
+| `created_at` | TIMESTAMP | DEFAULT NOW() | Date d'envoi |
 
 ---
 
 ## Diagramme des relations (MCD)
 
-```
-UTILISATEURS (1) ──┬──→ (N) COMPÉTENCES 
-                    ├──→ (N) LACUNES
-                    ├──→ (N) DISPONIBILITÉS
-                    ├──→ (N) OFFRES ────┐
-                    │                    ├──→ (N) MATCHS ──→ (1) CONVERSATIONS ──→ (N) MESSAGES
-                    └──→ (N) DEMANDES ──┘
-```
-
----
-
-## Relations détaillées
-
-| Relation | Type | Clés | Cardinalité |
-|----------|------|------|------------|
-| UTILISATEURS → COMPÉTENCES | 1-N | `competences.user_id` | 0 à N compétences par user |
-| UTILISATEURS → LACUNES  | 1-N | `lacunes.user_id` | 0 à N lacunes par user |
-| UTILISATEURS → DISPONIBILITÉS | 1-N | `disponibilites.user_id` | 0 à N créneaux par user |
-| UTILISATEURS → OFFRES | 1-N | `offres.user_id` | 0 à N offres par user |
-| UTILISATEURS → DEMANDES | 1-N | `demandes.user_id` | 0 à N demandes par user |
-| OFFRES → MATCHS | 1-N | `matchs.offre_id` | 0 à N matchs par offre |
-| DEMANDES → MATCHS | 1-N | `matchs.demande_id` | 0 à N matchs par demande |
-| UTILISATEURS → MATCHS (mentor) | 1-N | `matchs.mentor_id` | 0 à N matchs comme mentor |
-| UTILISATEURS → MATCHS (mentoré) | 1-N | `matchs.mentore_id` | 0 à N matchs comme mentoré |
-| MATCHS → CONVERSATIONS | 1-1 | `conversations.match_id` UNIQUE | 0 ou 1 conversation par match |
-| CONVERSATIONS → MESSAGES | 1-N | `messages.conversation_id` | 0 à N messages par conversation |
-| UTILISATEURS → MESSAGES (expediteur) | 1-N | `messages.expediteur_id` | 0 à N messages envoyés |
-
----
-
-## Résumé final des entités (V3)
+Le diagramme d'architecture mis à jour est disponible dans `MCD_RELATIONS.mermaid`.
 
 ```
-✅ UTILISATEURS (12 attributs)
-✅ COMPÉTENCES (7 attributs) — Points forts
-✅ LACUNES (8 attributs) — Points faibles
-✅ DISPONIBILITÉS (5 attributs)
-✅ OFFRES (11 attributs)
-✅ DEMANDES (9 attributs)
-✅ MATCHS (11 attributs)
-✅ CONVERSATIONS (4 attributs)
-✅ MESSAGES (5 attributs)
-
-Total : 10 entités, ~72 attributs
+users (1) ──┬──→ (N) user_skills 
+            ├──→ (N) user_availabilities
+            ├──→ (N) mentorship_posts ────┐
+            │                             ├──→ (N) matches ──→ (1) conversations ──→ (N) messages
+            └──→ (N) matches (mentor/mentee) 
 ```
 
 ---
 
 **Document créé pour le projet IFRI_MentorLink**
 
-**Version 2.0 — Juin 2026**  
-**Améliorations :** 
-  - Dissociation COMPÉTENCES / LACUNES
-  - Dissociation OFFRES / DEMANDES
+**Version 3.0 — Juin 2026**  
+**Mise à jour :** Alignement complet avec le schéma réel de la base de données (`backend/schema.sql`).
