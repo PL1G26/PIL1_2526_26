@@ -1,6 +1,6 @@
 """Service d'authentification et gestion des tokens JWT."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 
 import bcrypt
@@ -25,7 +25,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
     """Create a JWT access token for the given payload."""
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(hours=settings.token_expire_hours))
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(hours=settings.token_expire_hours))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 

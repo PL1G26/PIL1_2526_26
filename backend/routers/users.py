@@ -116,6 +116,46 @@ async def get_current_user_profile(
     )
 
 
+@router.get(
+    "/{user_id}",
+    response_model=UserProfileResponse,
+    summary="Récupérer le profil d'un autre utilisateur",
+)
+async def get_user_profile(
+    user_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> UserProfileResponse:
+    """
+    Retourne le profil complet d'un utilisateur,
+    y compris ses compétences et disponibilités.
+    """
+    user_query = text("SELECT * FROM users WHERE id = :user_id")
+    target_user = db.execute(user_query, {"user_id": user_id}).fetchone()
+    
+    if not target_user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    skills = _get_user_skills(db, user_id)
+    availabilities = _get_user_availabilities(db, user_id)
+    
+    return UserProfileResponse(
+        id=target_user.id,
+        first_name=target_user.first_name,
+        last_name=target_user.last_name,
+        email=target_user.email,
+        phone_number=target_user.phone_number,
+        profile_photo=target_user.profile_photo,
+        field_of_study=target_user.field_of_study,
+        level=target_user.level,
+        bio=target_user.bio,
+        created_at=target_user.created_at,
+        updated_at=target_user.updated_at,
+        skills=[UserSkillResponse(**s) for s in skills],
+        availabilities=[AvailabilityResponse(**a) for a in availabilities],
+    )
+
+
 @router.put(
     "/me",
     response_model=UserBasicResponse,

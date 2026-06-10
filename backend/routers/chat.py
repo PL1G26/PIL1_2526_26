@@ -19,6 +19,7 @@ from schemas.message_schema import (
     MessageListResponse,
     MessageResponse,
     SendMessageRequest,
+    DirectMessageRequest,
     UserBasicResponse,
 )
 
@@ -102,13 +103,25 @@ async def get_my_conversations(
     Retourne la liste des conversations de l'utilisateur connecté,
     avec le dernier message et le nombre de messages non lus.
     """
-    # Récupérer toutes les conversations où l'utilisateur est participant
     query = text("""
         SELECT 
             c.id, c.match_id, c.created_at, c.updated_at,
-            m.mentor_id, m.mentee_id, m.status as match_status
+            m.mentor_id, m.mentee_id, m.status as match_status,
+            u.id as other_id, u.first_name as other_first_name, u.last_name as other_last_name, u.profile_photo as other_profile_photo,
+            lm.id as lm_id, lm.sender_id as lm_sender_id, lm.content as lm_content, lm.is_read as lm_is_read, lm.created_at as lm_created_at,
+            lms.id as lms_id, lms.first_name as lms_first_name, lms.last_name as lms_last_name, lms.profile_photo as lms_profile_photo,
+            (SELECT COUNT(*) FROM messages WHERE conversation_id = c.id AND sender_id != :user_id AND is_read = FALSE) as unread_count
         FROM conversations c
         JOIN matches m ON c.match_id = m.id
+        JOIN users u ON u.id = CASE WHEN m.mentor_id = :user_id THEN m.mentee_id ELSE m.mentor_id END
+        LEFT JOIN LATERAL (
+            SELECT id, sender_id, content, is_read, created_at
+            FROM messages
+            WHERE conversation_id = c.id
+            ORDER BY created_at DESC
+            LIMIT 1
+        ) lm ON true
+        LEFT JOIN users lms ON lms.id = lm.sender_id
         WHERE m.status = 'accepted'
         AND (m.mentor_id = :user_id OR m.mentee_id = :user_id)
         ORDER BY c.updated_at DESC
@@ -117,75 +130,35 @@ async def get_my_conversations(
     
     conversations = []
     for row in result:
-        # Récupérer l'autre utilisateur
-        other_user_id = row.mentee_id if row.mentor_id == current_user.id else row.mentor_id
-        user_query = text("""
-            SELECT id, first_name, last_name, profile_photo
-            FROM users WHERE id = :user_id
-        """)
-        user_result = db.execute(user_query, {"user_id": other_user_id}).fetchone()
-        
-        other_user = {
-            "id": user_result.id,
-            "first_name": user_result.first_name,
-            "last_name": user_result.last_name,
-            "profile_photo": user_result.profile_photo,
-        }
-        
-        # Récupérer le dernier message
-        last_msg_query = text("""
-            SELECT id, conversation_id, sender_id, content, is_read, created_at
-            FROM messages
-            WHERE conversation_id = :conv_id
-            ORDER BY created_at DESC
-            LIMIT 1
-        """)
-        last_msg = db.execute(last_msg_query, {"conv_id": row.id}).fetchone()
-        
-        # Récupérer le sender du dernier message
-        sender = None
-        if last_msg:
-            sender_query = text("""
-                SELECT id, first_name, last_name, profile_photo
-                FROM users WHERE id = :sender_id
-            """)
-            sender_result = db.execute(sender_query, {"sender_id": last_msg.sender_id}).fetchone()
-            sender = {
-                "id": sender_result.id,
-                "first_name": sender_result.first_name,
-                "last_name": sender_result.last_name,
-                "profile_photo": sender_result.profile_photo,
-            }
-        
-        # Compter les messages non lus
-        unread_query = text("""
-            SELECT COUNT(*) as count
-            FROM messages
-            WHERE conversation_id = :conv_id
-            AND sender_id != :user_id
-            AND is_read = FALSE
-        """)
-        unread_result = db.execute(unread_query, {"conv_id": row.id, "user_id": current_user.id}).fetchone()
-        
         last_message = None
-        if last_msg and sender:
+        if row.lm_id:
             last_message = MessageResponse(
-                id=last_msg.id,
-                conversation_id=last_msg.conversation_id,
-                sender_id=last_msg.sender_id,
-                sender=UserBasicResponse(**sender),
-                content=last_msg.content,
-                is_read=last_msg.is_read,
-                created_at=last_msg.created_at,
+                id=row.lm_id,
+                conversation_id=row.id,
+                sender_id=row.lm_sender_id,
+                sender=UserBasicResponse(
+                    id=row.lms_id,
+                    first_name=row.lms_first_name,
+                    last_name=row.lms_last_name,
+                    profile_photo=row.lms_profile_photo,
+                ),
+                content=row.lm_content,
+                is_read=row.lm_is_read,
+                created_at=row.lm_created_at,
             )
-        
+            
         conversations.append(
             ConversationResponse(
                 id=row.id,
                 match_id=row.match_id,
-                other_user=UserBasicResponse(**other_user),
+                other_user=UserBasicResponse(
+                    id=row.other_id,
+                    first_name=row.other_first_name,
+                    last_name=row.other_last_name,
+                    profile_photo=row.other_profile_photo,
+                ),
                 last_message=last_message,
-                unread_count=unread_result.count if unread_result else 0,
+                unread_count=row.unread_count,
                 created_at=row.created_at,
                 updated_at=row.updated_at,
             )
@@ -300,6 +273,12 @@ async def send_message(
     })
     # Lire le résultat AVANT le commit : psycopg2 ferme le curseur après commit
     row = result.fetchone()
+    msg_id = row.id
+    msg_conv_id = row.conversation_id
+    msg_sender_id = row.sender_id
+    msg_content = row.content
+    msg_is_read = row.is_read
+    msg_created_at = row.created_at
     db.commit()
     
     # Mettre à jour updated_at de la conversation
@@ -310,18 +289,112 @@ async def send_message(
     db.commit()
     
     return MessageResponse(
-        id=row.id,
-        conversation_id=row.conversation_id,
-        sender_id=row.sender_id,
+        id=msg_id,
+        conversation_id=msg_conv_id,
+        sender_id=msg_sender_id,
         sender=UserBasicResponse(
             id=current_user.id,
             first_name=current_user.first_name,
             last_name=current_user.last_name,
             profile_photo=current_user.profile_photo,
         ),
-        content=row.content,
-        is_read=row.is_read,
-        created_at=row.created_at,
+        content=msg_content,
+        is_read=msg_is_read,
+        created_at=msg_created_at,
+    )
+
+
+@router.post(
+    "/conversations/direct",
+    response_model=MessageResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Envoyer un message direct",
+)
+async def send_direct_message(
+    request: DirectMessageRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MessageResponse:
+    """
+    Envoie un message direct en créant un match et une conversation si nécessaire.
+    """
+    # 1. Vérifier si un match existe déjà
+    match_query = text("""
+        SELECT id, status FROM matches 
+        WHERE (mentor_id = :u1 AND mentee_id = :u2)
+           OR (mentor_id = :u2 AND mentee_id = :u1)
+        LIMIT 1
+    """)
+    match_row = db.execute(match_query, {"u1": current_user.id, "u2": request.target_user_id}).fetchone()
+    
+    if match_row:
+        match_id = match_row.id
+        if match_row.status != "accepted":
+            db.execute(text("UPDATE matches SET status = 'accepted' WHERE id = :match_id"), {"match_id": match_id})
+    else:
+        # Créer le match
+        insert_match = text("""
+            INSERT INTO matches (mentor_id, mentee_id, skill_id, score, status)
+            VALUES (:mentor_id, :mentee_id, :skill_id, 100, 'accepted')
+            RETURNING id
+        """)
+        result = db.execute(insert_match, {
+            "mentor_id": request.target_user_id,
+            "mentee_id": current_user.id,
+            "skill_id": request.skill_id
+        })
+        match_id = result.scalar_one()
+    db.commit()
+
+    # 2. Vérifier/Créer la conversation
+    conv_query = text("SELECT id FROM conversations WHERE match_id = :match_id LIMIT 1")
+    conv_row = db.execute(conv_query, {"match_id": match_id}).fetchone()
+    
+    if conv_row:
+        conversation_id = conv_row.id
+    else:
+        insert_conv = text("INSERT INTO conversations (match_id) VALUES (:match_id) RETURNING id")
+        conv_res = db.execute(insert_conv, {"match_id": match_id})
+        conversation_id = conv_res.scalar_one()
+    db.commit()
+
+    # 3. Insérer le message
+    insert_msg = text("""
+        INSERT INTO messages (conversation_id, sender_id, content)
+        VALUES (:conversation_id, :sender_id, :content)
+        RETURNING id, conversation_id, sender_id, content, is_read, created_at
+    """)
+    row = db.execute(insert_msg, {
+        "conversation_id": conversation_id,
+        "sender_id": current_user.id,
+        "content": request.content,
+    }).fetchone()
+    
+    msg_id = row.id
+    msg_conv_id = row.conversation_id
+    msg_sender_id = row.sender_id
+    msg_content = row.content
+    msg_is_read = row.is_read
+    msg_created_at = row.created_at
+    db.commit()
+
+    update_conv = text("UPDATE conversations SET updated_at = NOW() WHERE id = :conversation_id")
+    db.execute(update_conv, {"conversation_id": conversation_id})
+    db.commit()
+
+    return MessageResponse(
+        id=msg_id,
+        conversation_id=msg_conv_id,
+        sender_id=msg_sender_id,
+        sender=UserBasicResponse(
+            id=current_user.id,
+            first_name=current_user.first_name,
+            last_name=current_user.last_name,
+            profile_photo=current_user.profile_photo,
+        ),
+        content=msg_content,
+        is_read=msg_is_read,
+        created_at=msg_created_at,
     )
 
 

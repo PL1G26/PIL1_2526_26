@@ -3,6 +3,12 @@
 # backend/test_models.py
 # ============================================================
 
+import sys
+import os
+# Ajoute backend/ au sys.path → permet d'importer database, models, etc.
+# Fonctionne que le script soit lancé avec pytest OU python3 directement.
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 from database import SessionLocal
 from models import User, Skill, MentorshipPost, Match, Conversation, Message
 

@@ -4,6 +4,11 @@
 # ============================================================
 
 import sys
+import os
+# Ajoute backend/ au sys.path → permet d'importer database, models, services, etc.
+# Fonctionne que le script soit lancé avec pytest OU python3 directement.
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 from typing import Dict, List, Optional
 from datetime import datetime
 

@@ -28,13 +28,11 @@ python-dotenv>=1.0.0
 python-multipart>=0.0.6
 httpx>=0.27.0
 
-psycopg2
-
 # Optional: ASGI & Performance
 # starlette==0.27.0  (included with FastAPI)
 
 # Development (optional, can be in separate dev-requirements.txt)
-# pytest>=7.4.0
-# pytest-asyncio>=0.21.0
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
 # black>=23.11.0
 # flake8>=6.1.0

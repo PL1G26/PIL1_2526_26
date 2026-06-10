@@ -119,30 +119,29 @@ async def get_my_matches(
     # Calculer les matches
     computed_matches = compute_matches_for_user(db, current_user.id)
     
-    # Insérer les nouveaux matches dans la base de données
-    for match_data in computed_matches:
-        # Vérifier si le match existe déjà
-        existing = text("""
-            SELECT id FROM matches 
-            WHERE mentor_id = :mentor_id 
-            AND mentee_id = :mentee_id 
-            AND skill_id = :skill_id
-        """)
-        existing_result = db.execute(existing, {
-            "mentor_id": match_data["mentor_id"],
-            "mentee_id": match_data["mentee_id"],
-            "skill_id": match_data["skill_id"],
-        }).fetchone()
-        
-        if not existing_result:
-            # Insérer le nouveau match
-            insert_query = text("""
-                INSERT INTO matches (mentor_id, mentee_id, skill_id, score, status)
-                VALUES (:mentor_id, :mentee_id, :skill_id, :score, :status)
-            """)
-            db.execute(insert_query, match_data)
+    # Récupérer tous les matches existants pour cet utilisateur en une seule requête
+    existing_query = text("""
+        SELECT mentor_id, mentee_id, skill_id 
+        FROM matches 
+        WHERE mentor_id = :user_id OR mentee_id = :user_id
+    """)
+    existing_rows = db.execute(existing_query, {"user_id": current_user.id}).fetchall()
+    existing_set = {(row.mentor_id, row.mentee_id, row.skill_id) for row in existing_rows}
     
-    db.commit()
+    new_matches = []
+    for match_data in computed_matches:
+        key = (match_data["mentor_id"], match_data["mentee_id"], match_data["skill_id"])
+        if key not in existing_set:
+            new_matches.append(match_data)
+            existing_set.add(key)
+            
+    if new_matches:
+        insert_query = text("""
+            INSERT INTO matches (mentor_id, mentee_id, skill_id, score, status, created_at)
+            VALUES (:mentor_id, :mentee_id, :skill_id, :score, :status, :created_at)
+        """)
+        db.execute(insert_query, new_matches)
+        db.commit()
     
     # Récupérer les matches de l'utilisateur (où il est mentor ou mentoré)
     query = text("""

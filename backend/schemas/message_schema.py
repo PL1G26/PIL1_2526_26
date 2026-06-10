@@ -1,7 +1,7 @@
 """
 Schémas Pydantic pour les messages.
 """
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 from datetime import datetime
 
@@ -13,8 +13,7 @@ class UserBasicResponse(BaseModel):
     last_name: str
     profile_photo: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class MessageResponse(BaseModel):
@@ -27,13 +26,19 @@ class MessageResponse(BaseModel):
     is_read: bool
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class SendMessageRequest(BaseModel):
     """Schéma pour envoyer un message."""
     content: str = Field(..., min_length=1)
+
+
+class DirectMessageRequest(BaseModel):
+    """Schéma pour envoyer un message direct."""
+    target_user_id: int
+    content: str = Field(..., min_length=1)
+    skill_id: Optional[int] = None
 
 
 class MessageListResponse(BaseModel):
@@ -52,8 +57,7 @@ class ConversationResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ConversationListResponse(BaseModel):

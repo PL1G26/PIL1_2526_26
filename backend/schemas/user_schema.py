@@ -1,7 +1,7 @@
 """
 Schémas Pydantic pour les utilisateurs.
 """
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 
@@ -11,8 +11,7 @@ class SkillResponse(BaseModel):
     id: int
     name: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserSkillResponse(BaseModel):
@@ -21,8 +20,7 @@ class UserSkillResponse(BaseModel):
     skill: SkillResponse
     proficiency: str  # 'strong' ou 'weak'
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AvailabilityResponse(BaseModel):
@@ -32,8 +30,7 @@ class AvailabilityResponse(BaseModel):
     start_time: str
     end_time: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserProfileResponse(BaseModel):
@@ -52,8 +49,7 @@ class UserProfileResponse(BaseModel):
     skills: List[UserSkillResponse] = []
     availabilities: List[AvailabilityResponse] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UpdateProfileRequest(BaseModel):
@@ -88,5 +84,4 @@ class UserBasicResponse(BaseModel):
     field_of_study: str
     level: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

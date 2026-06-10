@@ -3,6 +3,11 @@ Script de test pour les schémas Pydantic.
 Teste la validation des données pour chaque schéma.
 """
 import sys
+import os
+# Ajoute backend/ au sys.path → permet d'importer schemas, etc.
+# Fonctionne que le script soit lancé avec pytest OU python3 directement.
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 from datetime import datetime, time
 from pydantic import ValidationError
 

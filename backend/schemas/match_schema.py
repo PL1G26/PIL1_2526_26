@@ -1,7 +1,7 @@
 """
 Schémas Pydantic pour les correspondances (matches).
 """
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
 
@@ -11,8 +11,7 @@ class SkillBasicResponse(BaseModel):
     id: int
     name: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserBasicResponse(BaseModel):
@@ -24,8 +23,7 @@ class UserBasicResponse(BaseModel):
     field_of_study: str
     level: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class MatchResponse(BaseModel):
@@ -43,8 +41,7 @@ class MatchResponse(BaseModel):
     status: str  # 'pending', 'accepted', 'rejected'
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class MatchListResponse(BaseModel):

@@ -11,7 +11,7 @@ class User(Base):
     email = Column(String(100), unique=True, nullable=False)
     phone_number = Column(String(20), unique=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
-    profile_photo = Column(String(255), nullable=True)  # URL, NULL if no photo
+    profile_photo = Column(Text, nullable=True)  # URL or Base64, NULL if no photo
     field_of_study = Column(String(50), nullable=False)  # IA, IM, GL, SE&IoT, SI
     level = Column(String(20), nullable=False)  # L1, L2, L3, M1, M2
     bio = Column(Text, nullable=True)

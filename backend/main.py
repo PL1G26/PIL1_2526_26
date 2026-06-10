@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
+from contextlib import asynccontextmanager
 
 from config import settings
 from database import test_connection
@@ -14,6 +15,23 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Gestionnaire de cycle de vie au démarrage et arrêt"""
+    logger.info("🚀 IFRI_MentorLink API démarrée")
+    logger.info(f"Environment: {settings.env}")
+    logger.info(f"Database: {settings.database_url.split('@')[1] if '@' in settings.database_url else 'N/A'}")
+    logger.info(f"Allowed origins: {settings.allowed_origins}")
+    
+    if test_connection():
+        logger.info("✓ Database connection successful!")
+    else:
+        logger.warning("⚠️  Database connection failed - check your DATABASE_URL")
+    
+    yield
+    
+    logger.info("🛑 IFRI_MentorLink API arrêtée")
+
 # ──── FASTAPI INITIALIZATION ─────────────────────────────────
 app = FastAPI(
     title="IFRI_MentorLink API",
@@ -21,6 +39,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs" if settings.is_development() else None,  # Swagger UI
     redoc_url="/redoc" if settings.is_development() else None,  # ReDoc
+    lifespan=lifespan,
 )
 
 # ──── CORS MIDDLEWARE ────────────────────────────────────────
@@ -38,7 +57,7 @@ async def health_check():
     """Endpoint de vérification que l'API est en ligne"""
     return {
         "status": "ok",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "environment": settings.env,
     }
 
@@ -74,24 +93,7 @@ async def global_exception_handler(request, exc : Exception):
     )
 
 # ──── STARTUP & SHUTDOWN EVENTS ──────────────────────────────
-@app.on_event("startup")
-async def startup_event():
-    """Événement au démarrage"""
-    logger.info("🚀 IFRI_MentorLink API démarrée")
-    logger.info(f"Environment: {settings.env}")
-    logger.info(f"Database: {settings.database_url.split('@')[1] if '@' in settings.database_url else 'N/A'}")
-    logger.info(f"Allowed origins: {settings.allowed_origins}")
-    
-    # Test database connection
-    if test_connection():
-        logger.info("✓ Database connection successful!")
-    else:
-        logger.warning("⚠️  Database connection failed - check your DATABASE_URL")
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Événement à l'arrêt"""
-    logger.info("🛑 IFRI_MentorLink API arrêtée")
+# Géré maintenant par le `lifespan` handler défini plus haut.
 
 # ============================================================
 # DÉMARRAGE LOCAL:

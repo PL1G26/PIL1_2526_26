@@ -1,6 +1,6 @@
 """Service de calcul des correspondances mentor / mentoré."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 from sqlalchemy import text
@@ -90,16 +90,34 @@ def compute_matches_for_user(db: Session, current_user_id: int) -> List[Dict[str
     if user is None:
         return []
 
+    all_users = db.query(User).all()
+    user_ids = [u.id for u in all_users]
+
+    skills_query = text(
+        "SELECT user_id, skill_id, proficiency FROM user_skills WHERE user_id = ANY(:user_ids)"
+    )
+    all_skills = db.execute(skills_query, {"user_ids": user_ids}).mappings().all()
+    user_skills_map = {uid: [] for uid in user_ids}
+    for row in all_skills:
+        user_skills_map[row["user_id"]].append(dict(row))
+
+    avails_query = text(
+        "SELECT user_id, day_of_week, start_time, end_time FROM user_availabilities WHERE user_id = ANY(:user_ids)"
+    )
+    all_avails = db.execute(avails_query, {"user_ids": user_ids}).mappings().all()
+    user_avails_map = {uid: [] for uid in user_ids}
+    for row in all_avails:
+        user_avails_map[row["user_id"]].append(dict(row))
+
     user_data = {
         "id": user.id,
         "field_of_study": user.field_of_study,
         "level": user.level,
-        "skills": _load_user_skills(db, user.id),
-        "availabilities": _load_user_availabilities(db, user.id),
+        "skills": user_skills_map.get(user.id, []),
+        "availabilities": user_avails_map.get(user.id, []),
     }
 
     matches: List[Dict[str, Any]] = []
-    other_users = db.query(User).filter(User.id != current_user_id).all()
 
     user_weak_skills = {
         item["skill_id"]
@@ -107,13 +125,16 @@ def compute_matches_for_user(db: Session, current_user_id: int) -> List[Dict[str
         if item["proficiency"] == "weak"
     }
 
-    for other in other_users:
+    for other in all_users:
+        if other.id == current_user_id:
+            continue
+
         other_data = {
             "id": other.id,
             "field_of_study": other.field_of_study,
             "level": other.level,
-            "skills": _load_user_skills(db, other.id),
-            "availabilities": _load_user_availabilities(db, other.id),
+            "skills": user_skills_map.get(other.id, []),
+            "availabilities": user_avails_map.get(other.id, []),
         }
 
         other_strong_skills = {
@@ -133,7 +154,7 @@ def compute_matches_for_user(db: Session, current_user_id: int) -> List[Dict[str
                         "skill_id": skill_id,
                         "score": score,
                         "status": "pending",
-                        "created_at": datetime.utcnow(),
+                        "created_at": datetime.now(timezone.utc),
                     }
                 )
 

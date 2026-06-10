@@ -98,7 +98,7 @@ CREATE TABLE matches (
   status VARCHAR(20) NOT NULL DEFAULT 'pending',
   CHECK (status IN ('pending', 'accepted', 'rejected')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  CONSTRAINT chk_mentor_mentee_diff CHECK (mentor_id > mentee_id)
+  CONSTRAINT chk_mentor_mentee_diff CHECK (mentor_id != mentee_id)
 );
 
 -- ── TABLE: conversations ─────────────────────────────────────

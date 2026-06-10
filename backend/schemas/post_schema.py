@@ -1,7 +1,7 @@
 """
 Schémas Pydantic pour les posts de mentorat.
 """
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 
@@ -13,8 +13,7 @@ class PostAvailabilityResponse(BaseModel):
     start_time: str
     end_time: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class SkillBasicResponse(BaseModel):
@@ -22,8 +21,7 @@ class SkillBasicResponse(BaseModel):
     id: int
     name: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserBasicResponse(BaseModel):
@@ -35,8 +33,7 @@ class UserBasicResponse(BaseModel):
     field_of_study: str
     level: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PostResponse(BaseModel):
@@ -54,8 +51,7 @@ class PostResponse(BaseModel):
     updated_at: datetime
     availabilities: List[PostAvailabilityResponse] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CreatePostRequest(BaseModel):
