@@ -24,6 +24,8 @@ def get_allowed_origins() -> List[str]:
         "http://localhost:3000",
         "http://127.0.0.1:5173",
         "http://127.0.0.1:3000",
+        "https://ifri-mentorlink.vercel.app",
+        "https://pil-1-2526-26.vercel.app"
     ]
 
 
