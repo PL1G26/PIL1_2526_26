@@ -1,8 +1,11 @@
-# IFRI MentorLink — README Technique
+# IFRI MentorLink
 
-> **Projet intégrateur PIL1 — 2025-2026 (PIL1_2526_26)**
+> **Projet intégrateur PIL1 — 2025-2026 (Groupe PIL1-2526-26)**
 > Plateforme de mentorat académique pour les étudiants de l'IFRI
 
+---
+- Tester ici : https://ifri-mentorlink.vercel.app/
+- Rapport du projet : https://rapport-g26.vercel.app/
 ---
 
 ## Table des matières
@@ -647,6 +650,11 @@ Ce projet a été développé avec l'assistance de modèles de langage de la fam
 | **Claude Haiku 4.5** | Extension **GitHub Copilot / Claude** dans **VS Code** | Complétion de code, suggestions inline, refactoring rapide |
 | **Claude Sonnet 4.6** | **Antigravity** (assistant IA agentic) | Architecture, débogage, génération de documentation, revue de code |
 
+---
+---
+- Tester ici : https://ifri-mentorlink.vercel.app/
+- Rapport du projet : https://rapport-g26.vercel.app/
+---
 ---
 
 **© 2026 — Projet Intégrateur PIL1_2526_26 — IFRI**
