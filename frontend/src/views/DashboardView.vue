@@ -368,8 +368,8 @@
               <img v-else :src="conv.other_user.profile_photo" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" @error="onPhotoError('conv-'+conv.id)" />
               <!-- Infos -->
               <div class="conv-item-info">
-                <div class="conv-item-name">{{ conv.other_user?.first_name }} {{ conv.other_user?.last_name }}</div>
-                <div class="conv-item-preview">{{ conv.last_message?.content || 'Démarrer la conversation…' }}</div>
+                <div class="conv-item-name" :style="conv.unread_count > 0 ? 'font-weight: 700; color: var(--text);' : ''">{{ conv.other_user?.first_name }} {{ conv.other_user?.last_name }}</div>
+                <div class="conv-item-preview" :style="conv.unread_count > 0 ? 'font-weight: 600; color: var(--text);' : ''">{{ conv.last_message?.content || 'Démarrer la conversation…' }}</div>
               </div>
               <!-- Badge non-lu -->
               <div v-if="conv.unread_count > 0" class="unread-dot" :title="conv.unread_count + ' non lu(s)'"></div>
@@ -399,7 +399,13 @@
                     <span style="background: var(--surface2); padding: 8px 12px; border-radius: 12px; display: inline-block;">
                       {{ msg.content }}
                     </span>
-                    <div style="font-size: 10px; color: var(--text3); margin-top: 2px;">{{ new Date(msg.created_at).toLocaleTimeString() }}</div>
+                    <div style="font-size: 10px; color: var(--text3); margin-top: 2px;">
+                      {{ new Date(msg.created_at).toLocaleTimeString().slice(0,5) }}
+                      <span v-if="msg.sender_id === store.user.id" style="margin-left: 4px;" :title="msg.is_read ? 'Lu' : 'Envoyé'">
+                        <svg v-if="msg.is_read" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary)"><path d="m3 12 5 5 13-13"/><path d="m14 12 5 5 5-13"/></svg>
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
