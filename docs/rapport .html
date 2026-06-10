@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rapport — IFRI_MentorLink · Groupe 26</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#0D1117;--surface:#161B22;--surface2:#1e2333;--border:#21262D;
+      --accent:#7C6AF7;--accent2:#3ECFB2;--green:#3ecf8e;--orange:#f59e0b;--red:#ef4444;
+      --text:#E6EDF3;--muted:#8B949E;--dim:#5a6378;--tag-bg:#1F2A3A;
+      --radius:12px;--radius-sm:8px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.7;overflow-x:hidden;}
+
+    /* ── CANVAS & FX ── */
+    #particles-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.4;}
+    .cursor-glow{position:fixed;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(124,106,247,.13) 0%,transparent 70%);pointer-events:none;transform:translate(-50%,-50%);z-index:1;transition:opacity .3s;}
+    #progress-bar{position:fixed;top:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));z-index:200;}
+    nav,div,section,footer{position:relative;z-index:2;}
+
+    /* ── NAV ── */
+    nav{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1.5rem;padding:.85rem 2.5rem;flex-wrap:wrap;}
+    nav .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:var(--accent);text-decoration:none;white-space:nowrap;margin-right:.5rem;}
+    .nav-links{display:flex;gap:1.4rem;flex-wrap:wrap;}
+    nav a{color:var(--muted);text-decoration:none;font-size:.83rem;font-weight:500;transition:color .2s;position:relative;}
+    nav a::after{content:'';position:absolute;bottom:-3px;left:0;width:0;height:2px;background:var(--accent);transition:width .3s;border-radius:2px;}
+    nav a:hover{color:var(--text);}nav a:hover::after{width:100%;}
+    nav a.active{color:var(--accent);}nav a.active::after{width:100%;}
+    .nav-deploy{margin-left:auto;display:flex;align-items:center;gap:.5rem;background:rgba(62,207,178,.1);border:1px solid rgba(62,207,178,.3);color:var(--accent2);font-size:.78rem;font-weight:600;padding:.35rem .85rem;border-radius:20px;text-decoration:none;transition:background .2s;}
+    .nav-deploy:hover{background:rgba(62,207,178,.2);}
+    .nav-deploy::before{content:'🌐';font-size:.85rem;}
+
+    /* ── HERO ── */
+    .hero{padding:7rem 2.5rem 5rem;max-width:900px;margin:0 auto;text-align:center;}
+    .hero .eyebrow{display:inline-block;font-size:.75rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);background:rgba(62,207,178,.1);border:1px solid rgba(62,207,178,.25);border-radius:20px;padding:.3rem .85rem;margin-bottom:1.5rem;opacity:0;animation:fadeUp .6s .2s forwards;}
+    .hero h1{font-family:'Syne',sans-serif;font-size:clamp(2.4rem,5.5vw,3.6rem);font-weight:800;line-height:1.12;margin-bottom:1.2rem;opacity:0;animation:fadeUp .6s .35s forwards;}
+    .hero h1 span{color:var(--accent);}
+    .hero p{color:var(--muted);font-size:1.05rem;max-width:620px;margin:0 auto 2.5rem;opacity:0;animation:fadeUp .6s .5s forwards;}
+    .meta-row{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin-bottom:2rem;opacity:0;animation:fadeUp .6s .65s forwards;}
+    .badge-meta{font-size:.78rem;font-weight:500;background:var(--tag-bg);border:1px solid var(--border);border-radius:6px;padding:.3rem .7rem;color:var(--muted);transition:border-color .2s,color .2s;cursor:default;}
+    .badge-meta:hover{border-color:var(--accent);color:var(--text);}
+    .badge-meta strong{color:var(--text);}
+    .hero-deploy{display:inline-flex;align-items:center;gap:.6rem;background:linear-gradient(135deg,rgba(124,106,247,.15),rgba(62,207,178,.1));border:1px solid rgba(124,106,247,.4);color:var(--accent);font-size:.9rem;font-weight:600;padding:.65rem 1.4rem;border-radius:10px;text-decoration:none;transition:all .25s;opacity:0;animation:fadeUp .6s .8s forwards;}
+    .hero-deploy:hover{background:linear-gradient(135deg,rgba(124,106,247,.25),rgba(62,207,178,.15));border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,106,247,.2);}
+    .hero-deploy-dot{width:8px;height:8px;background:var(--accent2);border-radius:50%;animation:pulse 1.8s ease infinite;}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.4);}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+
+    /* ── REVEAL ── */
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity .55s ease,transform .55s ease;}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+
+    /* ── LAYOUT ── */
+    .container{max-width:900px;margin:0 auto;padding:0 2.5rem 6rem;}
+    section{margin-bottom:4.5rem;padding-top:3.5rem;border-top:1px solid var(--border);}
+    section:first-child{border-top:none;}
+
+    /* ── SECTION HEADERS ── */
+    .section-label{font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem;}
+    h2{font-family:'Syne',sans-serif;font-size:1.75rem;font-weight:700;margin-bottom:1.5rem;padding-bottom:.75rem;border-bottom:1px solid var(--border);}
+    h3{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:600;margin:2rem 0 .8rem;color:var(--accent2);}
+    p{color:var(--muted);margin-bottom:.9rem;}
+    p strong{color:var(--text);}
+    ul{padding-left:1.5rem;color:var(--muted);font-size:.88rem;}
+    li{margin-bottom:.35rem;}
+    strong{color:var(--text);}
+
+    /* ── BADGES ── */
+    .badge{display:inline-block;font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em;}
+    .badge-green{background:rgba(62,207,142,.12);color:var(--green);border:1px solid rgba(62,207,142,.25);}
+    .badge-blue{background:rgba(124,106,247,.12);color:var(--accent);border:1px solid rgba(124,106,247,.25);}
+    .badge-orange{background:rgba(245,158,11,.12);color:var(--orange);border:1px solid rgba(245,158,11,.25);}
+    .badge-red{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25);}
+    .badge-purple{background:rgba(124,92,191,.12);color:#b09cf7;border:1px solid rgba(124,92,191,.25);}
+
+    /* ── MEMBER CARDS ── */
+    .members-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:1rem;margin-top:1.25rem;}
+    .member-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.4rem;display:flex;flex-direction:column;gap:.35rem;transition:border-color .25s,transform .25s,box-shadow .25s;}
+    .member-card:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:0 12px 32px rgba(124,106,247,.12);}
+    .member-card.inactive{opacity:.45;border-style:dashed;}
+    .member-card.inactive:hover{border-color:var(--muted);box-shadow:none;transform:none;}
+    .member-header{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;margin-bottom:.1rem;}
+    .member-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.97rem;color:var(--text);}
+    .member-role{font-size:.75rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;}
+    .member-field{font-size:.78rem;color:var(--muted);background:var(--tag-bg);display:inline-block;border-radius:4px;padding:.15rem .55rem;border:1px solid var(--border);}
+    .member-tasks{font-size:.82rem;color:var(--muted);line-height:1.55;margin-top:.3rem;}
+    .member-email{font-size:.72rem;color:var(--accent2);opacity:.75;word-break:break-all;}
+
+    /* ── TOOLS ROW ── */
+    .tools-row{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1rem;}
+    .tool-chip{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 14px;font-size:.8rem;font-weight:500;transition:border-color .2s;}
+    .tool-chip:hover{border-color:var(--accent2);}
+
+    /* ── MODULE CARDS ── */
+    .modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:1rem;}
+    .module-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;transition:border-color .25s,transform .25s;}
+    .module-card:hover{border-color:var(--accent2);transform:translateY(-3px);}
+    .module-icon{font-size:1.9rem;margin-bottom:.65rem;}
+    .module-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.97rem;color:var(--text);margin-bottom:.5rem;}
+    .module-desc{font-size:.83rem;color:var(--muted);}
+
+    /* ── STACK TABLE ── */
+    .stack-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-top:1rem;}
+    .stack-table{width:100%;border-collapse:collapse;font-size:.85rem;}
+    .stack-table th{text-align:left;padding:.6rem 1rem;background:var(--surface2);color:var(--muted);font-weight:600;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;}
+    .stack-table td{padding:.75rem 1rem;border-top:1px solid var(--border);vertical-align:middle;}
+    .stack-table tr:hover td{background:rgba(255,255,255,.02);}
+
+    /* ── WORKFLOW CARDS ── */
+    .workflow-block{background:var(--surface);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:1rem 1.4rem;margin-bottom:.8rem;transition:border-color .2s;}
+    .workflow-block:hover{border-left-color:var(--accent2);}
+    .workflow-day{font-weight:700;color:var(--text);font-size:.9rem;margin-bottom:.3rem;}
+    .workflow-tasks{font-size:.83rem;color:var(--muted);}
+
+    /* ── ROLE SPLIT ── */
+    .role-split{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;}
+    @media(max-width:580px){.role-split{grid-template-columns:1fr;}}
+    .role-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;}
+    .role-box-title{font-weight:600;font-size:.88rem;margin-bottom:.75rem;}
+
+    /* ── ALGO SCORE BARS ── */
+    .score-list{display:flex;flex-direction:column;gap:.9rem;margin:1rem 0;}
+    .score-label{display:flex;justify-content:space-between;font-size:.83rem;margin-bottom:.35rem;color:var(--text);}
+    .score-label span{color:var(--accent2);font-weight:600;}
+    .score-track{background:var(--border);border-radius:4px;height:6px;overflow:hidden;}
+    .score-fill{height:100%;border-radius:4px;width:0;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+    .score-fill.purple{background:linear-gradient(90deg,var(--accent),#b09cf7);}
+    .score-fill.teal{background:linear-gradient(90deg,var(--accent2),#7ef0dc);}
+    .score-fill.gold{background:linear-gradient(90deg,#f7a76a,#f7d76a);}
+
+    /* ── CRITERIA CARDS ── */
+    .criteria-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem;}
+    @media(max-width:640px){.criteria-row{grid-template-columns:1fr;}}
+    .criterion{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center;transition:border-color .25s;}
+    .criterion:hover{border-color:var(--accent);}
+    .criterion .pts{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--accent);}
+    .criterion h4{font-weight:600;font-size:.85rem;margin:.35rem 0;}
+    .criterion p{color:var(--muted);font-size:.78rem;margin:0;}
+
+    /* ── DB SCHEMA GRID ── */
+    .db-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem;}
+    .db-table{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;transition:border-color .2s,transform .2s;}
+    .db-table:hover{border-color:var(--accent);transform:translateY(-2px);}
+    .db-table-name{background:var(--surface2);padding:.5rem 1rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:var(--accent);border-bottom:1px solid var(--border);}
+    .db-table-body{padding:.5rem .75rem;}
+    .schema-field{display:flex;align-items:center;gap:.4rem;padding:.2rem 0;font-size:.75rem;color:var(--muted);}
+    .schema-field .pk{color:var(--orange);font-weight:700;font-size:.65rem;}
+    .schema-field .fk{color:#b09cf7;font-weight:700;font-size:.65rem;}
+
+    /* ── API ENDPOINTS ── */
+    .endpoints-grid{display:flex;flex-direction:column;gap:.5rem;margin-top:.75rem;}
+    .endpoint{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.7rem 1rem;display:flex;align-items:center;gap:.75rem;font-size:.82rem;transition:border-color .2s;}
+    .endpoint:hover{border-color:var(--accent);}
+    .method{font-weight:700;font-size:.72rem;width:44px;text-align:center;padding:2px 0;border-radius:4px;}
+    .method.get{background:rgba(62,207,142,.15);color:var(--green);}
+    .method.post{background:rgba(124,106,247,.15);color:var(--accent);}
+    .method.put{background:rgba(245,158,11,.15);color:var(--orange);}
+    .endpoint-path{font-family:monospace;color:var(--accent2);font-size:.82rem;}
+    .endpoint-desc{color:var(--muted);margin-left:auto;font-size:.78rem;text-align:right;}
+    .lock{font-size:.72rem;margin-left:.3rem;opacity:.6;}
+
+    /* ── DEPLOY INFO BOX ── */
+    .info-row{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem;}
+    .info-box{flex:1;min-width:160px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.25rem;}
+    .info-box .label{font-size:.72rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem;}
+    .info-box .value{font-weight:600;font-size:.95rem;}
+    .deploy-live-banner{background:linear-gradient(135deg,rgba(62,207,178,.1),rgba(124,106,247,.08));border:1px solid rgba(62,207,178,.35);border-radius:var(--radius);padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;}
+    .deploy-live-dot{width:10px;height:10px;background:var(--accent2);border-radius:50%;flex-shrink:0;animation:pulse 1.8s ease infinite;}
+    .deploy-live-text{flex:1;}
+    .deploy-live-text strong{color:var(--accent2);display:block;font-size:.88rem;margin-bottom:.2rem;}
+    .deploy-live-text a{color:var(--accent);font-size:.82rem;text-decoration:none;}
+    .deploy-live-text a:hover{text-decoration:underline;}
+
+    /* ── STEP LIST ── */
+    .steps-list{display:flex;flex-direction:column;gap:1rem;margin-top:1.25rem;}
+    .step-item{display:flex;gap:1.25rem;align-items:flex-start;}
+    .step-num{flex-shrink:0;width:32px;height:32px;background:rgba(124,106,247,.15);border:1px solid rgba(124,106,247,.35);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;color:var(--accent);margin-top:.1rem;}
+    .step-content h4{font-weight:600;margin-bottom:.25rem;font-size:.92rem;color:var(--text);}
+    .step-content p{color:var(--muted);font-size:.85rem;margin:0;}
+
+    /* ── CODE BLOCKS ── */
+    pre{background:#0a0c12;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.2rem 1.4rem;font-size:.8rem;overflow-x:auto;color:#c9d1d9;line-height:1.65;margin-bottom:1rem;position:relative;}
+    code{font-family:'Fira Code','Cascadia Code',monospace;}
+    .copy-btn{position:absolute;top:.6rem;right:.7rem;background:var(--tag-bg);border:1px solid var(--border);color:var(--muted);font-size:.72rem;padding:.25rem .6rem;border-radius:5px;cursor:pointer;transition:color .2s,border-color .2s;}
+    .copy-btn:hover{color:var(--text);border-color:var(--accent);}
+    .copy-btn.copied{color:var(--accent2);border-color:var(--accent2);}
+
+    /* ── ALERT ── */
+    .alert{background:rgba(124,106,247,.08);border:1px solid rgba(124,106,247,.3);border-radius:10px;padding:1rem 1.4rem;font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;}
+    .alert strong{color:var(--accent);}
+
+    /* ── TYPED ── */
+    .typed-cursor{display:inline-block;width:3px;height:.9em;background:var(--accent);vertical-align:middle;margin-left:2px;animation:blink .75s step-end infinite;}
+    @keyframes blink{50%{opacity:0;}}
+
+    /* ── BACK TOP ── */
+    #back-top{position:fixed;bottom:2rem;right:2rem;width:42px;height:42px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s,border-color .2s,color .2s,transform .2s;z-index:50;}
+    #back-top.show{opacity:1;pointer-events:all;}
+    #back-top:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px);}
+
+    /* ── LINK BTN ── */
+    .link-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(124,106,247,.1);border:1px solid rgba(124,106,247,.3);color:var(--accent);padding:8px 18px;border-radius:var(--radius-sm);font-size:.85rem;font-weight:500;text-decoration:none;transition:background .2s;}
+    .link-btn:hover{background:rgba(124,106,247,.2);}
+
+    /* ── FOOTER ── */
+    footer{border-top:1px solid var(--border);text-align:center;padding:2.2rem;font-size:.8rem;color:var(--muted);position:relative;z-index:2;}
+    footer a{color:var(--accent);text-decoration:none;}
+
+    @media(max-width:600px){
+      nav{padding:.75rem 1.2rem;gap:1rem;}
+      .nav-links{display:none;}
+      .nav-deploy{margin-left:0;}
+      .hero,.container{padding-left:1.2rem;padding-right:1.2rem;}
+    }
+  </style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<div class="cursor-glow" id="cursor-glow"></div>
+<canvas id="particles-canvas"></canvas>
+<button id="back-top" title="Haut de page">&#8593;</button>
+
+<nav>
+  <a class="logo" href="#">&#x2B21; IFRI_MentorLink</a>
+  <div class="nav-links">
+    <a href="#groupe">Groupe</a>
+    <a href="#organisation">Organisation</a>
+    <a href="#conception">Conception</a>
+    <a href="#bdd">Base de données</a>
+    <a href="#api">API</a>
+    <a href="#deploiement">Déploiement</a>
+    <a href="#manuel">Manuel</a>
+  </div>
+  <a class="nav-deploy" href="https://ifri-mentorlink.vercel.app/" target="_blank">&nbsp;ifri-mentorlink.vercel.app</a>
+</nav>
+
+<div class="hero">
+  <div class="eyebrow">Projet Intégrateur PIL1 &middot; 2025-2026</div>
+  <h1>IFRI_<span id="typed-word"></span><span class="typed-cursor"></span></h1>
+  <p>Plateforme de mise en relation entre étudiants-mentors et étudiants-mentorés au sein de l'IFRI — Université d'Abomey-Calavi.</p>
+  <div class="meta-row">
+    <span class="badge-meta"><strong>Groupe</strong> PIL1_2526_26</span>
+    <span class="badge-meta"><strong>Dépôt</strong> github.com/PL1G26/PIL1_2526_26</span>
+    <span class="badge-meta"><strong>Stack</strong> Vue.js · FastAPI · PostgreSQL</span>
+    <span class="badge-meta"><strong>Deadline</strong> 10 juin 2026</span>
+  </div>
+  <a class="hero-deploy" href="https://ifri-mentorlink.vercel.app/" target="_blank">
+    <span class="hero-deploy-dot"></span>
+    Application déployée — ifri-mentorlink.vercel.app
+  </a>
+</div>
+
+<div class="container">
+
+  <!-- ══ SECTION 1 — GROUPE ══ -->
+  <section id="groupe">
+    <div class="section-label reveal">01 — Équipe</div>
+    <h2 class="reveal">Présentation du groupe</h2>
+    <p class="reveal">Le groupe 26 est composé de <strong>sept étudiants</strong> issus de cinq filières différentes de l'IFRI : Intelligence Artificielle (IA), Génie Logiciel (GL), Sécurité Informatique (SI), Internet et Multimédia (IM) et Systèmes Embarqués et Internet des Objets (SEIOT). Cette mixité a permis d'aborder le projet avec des points de vue complémentaires, aussi bien sur la conception que sur le développement. Le travail a été structuré autour d'une répartition <strong>Frontend</strong> (3 membres) et <strong>Backend</strong> (3 membres actifs), coordonnés par une cheffe de projet.</p>
+
+    <h3 class="reveal">Membres de l'équipe</h3>
+    <div class="members-grid">
+      <div class="member-card reveal">
+        <div class="member-header">
+          <span class="member-name">KPENONHOUN E. H. Adorée</span>
+          <span class="badge badge-green">Chef</span>
+        </div>
+        <div class="member-role">Chef de Projet &amp; QA · Backend</div>
+        <div class="member-field">Filière : Intelligence Artificielle (IA)</div>
+        <div class="member-tasks">Coordination générale, suivi de l'avancement, gestion du dépôt GitHub, assurance qualité, authentification JWT, sécurité bcrypt, endpoints API, rédaction du rapport et de la documentation.</div>
+        <div class="member-email">hermionekpenonhoun@gmail.com</div>
+      </div>
+      <div class="member-card reveal">
+        <div class="member-header">
+          <span class="member-name">DINLA Marcel</span>
+          <span class="badge badge-blue">Backend Lead</span>
+        </div>
+        <div class="member-role">Backend &amp; Tech Lead</div>
+        <div class="member-field">Filière : Génie Logiciel (GL)</div>
+        <div class="member-tasks">Architecture globale de l'application, configuration FastAPI, gestion de la base de données SQLAlchemy/PostgreSQL, algorithme de matching, API REST (posts, conversations, messages) et revue de code.</div>
+        <div class="member-email">delsdenlamarcel@gmail.com</div>
+      </div>
+      <div class="member-card reveal">
+        <div class="member-header">
+          <span class="member-name">DHEHOUGA E. Estébania</span>
+        </div>
+        <div class="member-role">Développeuse Frontend</div>
+        <div class="member-field">Filière : Génie Logiciel (GL)</div>
+        <div class="member-tasks">Développement des composants Vue.js du dashboard (profil, posts, matching), intégration avec l'API REST via Axios, gestion de l'état global, interface ChatBox et intégration Supabase Realtime.</div>
+        <div class="member-email">estebaniadjehouga@gmail.com</div>
+      </div>
+      <div class="member-card reveal">
+        <div class="member-header">
+          <span class="member-name">AKOTONOU J-D B. Exauce</span>
+        </div>
+        <div class="member-role">Développeur Backend</div>
+        <div class="member-field">Filière : Internet et Multimédia (IM)</div>
+        <div class="member-tasks">Développement des endpoints de gestion des profils utilisateurs, compétences (strong/weak) et disponibilités horaires, ainsi que les tests unitaires associés.</div>
+        <div class="member-email">jeandedieuakotonou@gmail.com</div>
+      </div>
+      <div class="member-card reveal">
+        <div class="member-header">
+          <span class="member-name">AGO Mona</span>
+        </div>
+        <div class="member-role">Développeur Frontend</div>
+        <div class="member-field">Filière : Sécurité Informatique (SI)</div>
+        <div class="member-tasks">Conception de la landing page, des formulaires d'authentification (inscription et connexion), et intégration du store Pinia pour la gestion de session côté client.</div>
+        <div class="member-email">agom601@gmail.com</div>
+      </div>
+      <div class="member-card reveal">
+        <div class="member-header">
+          <span class="member-name">HESSA I. D. Jody</span>
+        </div>
+        <div class="member-role">Développeur Frontend</div>
+        <div class="member-field">Filière : SEIOT (Systèmes Embarqués des Objets et Internet des Objets)</div>
+        <div class="member-tasks">Développement du module de messagerie instantanée côté client, intégration de Supabase Realtime pour la réception des messages en temps réel, dashboard et affichage des matches.</div>
+        <div class="member-email">jodyhessa@gmail.com</div>
+      </div>
+      <div class="member-card inactive reveal">
+        <div class="member-header">
+          <span class="member-name">BABAGBETO Ronald Orence</span>
+          <span class="badge badge-red">Inactif</span>
+        </div>
+        <div class="member-role" style="color:var(--muted)">—</div>
+        <div class="member-field">Filière : Sécurité Informatique (SI)</div>
+        <div class="member-tasks">Membre du groupe n'ayant pas contribué au projet tout au long du processus de développement, non réactif aux communications de l'équipe.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 2 — ORGANISATION ══ -->
+  <section id="organisation">
+    <div class="section-label reveal">02 — Organisation</div>
+    <h2 class="reveal">Organisation &amp; méthode de travail</h2>
+    <p class="reveal">Dès le lancement du projet le <strong>1er juin 2026</strong>, le groupe a défini une organisation claire pour maximiser l'efficacité sur les 10 jours disponibles. Le travail a été structuré autour d'une répartition frontend/backend et d'un workflow Git rigoureux.</p>
+
+    <h3 class="reveal">Outils de communication &amp; collaboration</h3>
+    <div class="tools-row reveal">
+      <div class="tool-chip">💬 WhatsApp — coordination quotidienne</div>
+      <div class="tool-chip">🎙 Discord — sessions de travail en ligne</div>
+      <div class="tool-chip">📹 Google Meet — réunions avec encadrants</div>
+      <div class="tool-chip">🤝 Présentiel — sessions de développement groupées</div>
+      <div class="tool-chip">🔀 Git / GitHub — versionnage du code</div>
+      <div class="tool-chip">✔️ Trello — tâches et suivi</div>
+    </div>
+
+    <h3 class="reveal">Répartition des rôles</h3>
+    <div class="role-split reveal">
+      <div class="role-box">
+        <div class="role-box-title" style="color:var(--accent)">🎨 Frontend (3 membres)</div>
+        <ul>
+          <li><strong>Mona</strong> — Landing page &amp; authentification</li>
+          <li><strong>Estébania</strong> — Dashboard, profil, posts, matching UI</li>
+          <li><strong>Jody</strong> — Messagerie instantanée &amp; Realtime</li>
+        </ul>
+      </div>
+      <div class="role-box">
+        <div class="role-box-title" style="color:var(--accent2)">⚙️ Backend (3 membres actifs)</div>
+        <ul>
+          <li><strong>Adorée</strong> — Auth JWT, sécurité bcrypt, endpoints API</li>
+          <li><strong>Marcel</strong> — Architecture, Auth, Matching</li>
+          <li><strong>Exauce</strong> — Profils, compétences, disponibilités</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 class="reveal">Workflow Git</h3>
+    <p class="reveal">Le groupe a adopté un workflow à trois niveaux de branches pour éviter les conflits et garder le code <code>main</code> toujours stable :</p>
+    <div class="reveal"><pre id="code-git-flow">main       ← code stable, évalué en fin de projet
+├── develop    ← branche d'intégration commune
+├── frontend
+└── backend<button class="copy-btn" onclick="copyCode('code-git-flow',this)">Copier</button></pre></div>
+    <p class="reveal">Chaque développeur travaillait sur sa propre branche et ouvrait une <em>Pull Request</em> vers <code>develop</code> à la fin de chaque fonctionnalité. Les commits suivaient les conventions : <code>feat:</code>, <code>fix:</code>, <code>docs:</code>, <code>style:</code>, <code>test:</code>.</p>
+
+    <h3 class="reveal">Planning suivi</h3>
+    <div class="steps-list reveal">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Jour 1 — Vendredi (Setup)</h4>
+          <p>Création du dépôt GitHub, configuration des branches, exécution du script SQL dans Supabase, installation des environnements de développement frontend et backend.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Jour 2 — Samedi (Développement core)</h4>
+          <p>Développement parallèle : landing page + formulaires d'authentification côté frontend ; endpoints d'authentification JWT et gestion des profils côté backend.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Jour 3 — Dimanche (Intégration)</h4>
+          <p>Connexion frontend-backend via Axios, intégration de l'algorithme de matching, développement du module de messagerie avec Supabase Realtime, merge des branches vers <code>develop</code>.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Jours 4-5 — Lundi/Mardi + suivi encadrants (Finition)</h4>
+          <p>Corrections de bugs, amélioration du design, tests end-to-end, export du fichier <code>.sql</code>, rédaction du rapport HTML, merge final vers <code>main</code>.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <h4>Jour 6 — Mercredi (Déploiement)</h4>
+          <p>Mise en production de l'application sur Vercel — <a href="https://ifri-mentorlink.vercel.app/" target="_blank" style="color:var(--accent)">ifri-mentorlink.vercel.app</a> — et livraison finale du projet.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 3 — CONCEPTION ══ -->
+  <section id="conception">
+    <div class="section-label reveal">03 — Architecture</div>
+    <h2 class="reveal">Conception de l'application</h2>
+
+    <h3 class="reveal">Les 3 modules principaux</h3>
+    <div class="modules-grid">
+      <div class="module-card reveal">
+        <div class="module-icon">👤</div>
+        <div class="module-title">Module 1 — Comptes &amp; Profils</div>
+        <div class="module-desc">Inscription, connexion sécurisée par JWT, gestion du profil (compétences maîtrisées/lacunes, disponibilités horaires, informations académiques).</div>
+      </div>
+      <div class="module-card reveal">
+        <div class="module-icon">🔗</div>
+        <div class="module-title">Module 2 — Matching</div>
+        <div class="module-desc">Publication d'offres et demandes de mentorat. Algorithme de correspondance automatique calculant un score de compatibilité sur 100 pts.</div>
+      </div>
+      <div class="module-card reveal">
+        <div class="module-icon">💬</div>
+        <div class="module-title">Module 3 — Messagerie</div>
+        <div class="module-desc">Chat en temps réel via Supabase Realtime, historique complet des conversations, notifications instantanées, accès restreint aux matches acceptés.</div>
+      </div>
+    </div>
+
+    <h3 class="reveal">Stack technologique</h3>
+    <div class="stack-table-wrap reveal">
+      <table class="stack-table">
+        <thead><tr><th>Couche</th><th>Technologie</th><th>Justification</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-blue">Frontend</span></td><td><strong>Vue.js 3 + Vite</strong></td><td style="color:var(--muted)">Autorisé par le cahier des charges, réactivité automatique, composants réutilisables, Vue Router 4 avec guards JWT</td></tr>
+          <tr><td><span class="badge badge-green">Backend</span></td><td><strong>FastAPI (Python 3.11)</strong></td><td style="color:var(--muted)">Python obligatoire, documentation Swagger auto, validation Pydantic v2, JWT intégré (python-jose)</td></tr>
+          <tr><td><span class="badge badge-orange">Base de données</span></td><td><strong>PostgreSQL via Supabase</strong></td><td style="color:var(--muted)">Conforme au cahier des charges, hébergé cloud, Realtime natif (WebSocket) pour la messagerie</td></tr>
+          <tr><td><span class="badge badge-purple">ORM</span></td><td><strong>SQLAlchemy 2.0</strong></td><td style="color:var(--muted)">Mapping objet-relationnel, gestion des sessions, requêtes typées, psycopg3</td></tr>
+          <tr><td><span class="badge badge-blue">Auth</span></td><td><strong>JWT + passlib/bcrypt</strong></td><td style="color:var(--muted)">Mots de passe hachés, tokens signés avec expiration 24h, aucun mot de passe en clair en base</td></tr>
+          <tr><td><span class="badge badge-green">Tests</span></td><td><strong>pytest</strong></td><td style="color:var(--muted)">Tests unitaires &amp; intégration — modèles, schémas, services, routes</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="reveal">Architecture client-serveur</h3>
+    <div class="reveal"><pre id="code-archi">┌─────────────────────────────────────────────────────────┐
+│                   NAVIGATEUR (Vue.js 3)                  │
+│  LandingView · LoginView · RegisterView · DashboardView  │
+│  Store réactif (Pinia) · Vue Router 4 (guards JWT)       │
+└──────────────────────┬──────────────────────────────────┘
+                       │ HTTP REST / JSON (Axios)
+                       ▼
+┌─────────────────────────────────────────────────────────┐
+│                  SERVEUR API (FastAPI)                   │
+│  /api/auth  ·  /api/users  ·  /api/posts                │
+│  /api/matches  ·  /api/conversations  ·  /api/messages  │
+│  SQLAlchemy ORM  ·  JWT middleware  ·  Pydantic schemas  │
+└──────────────────────┬──────────────────────────────────┘
+                       │ SQL (psycopg3)
+                       ▼
+┌─────────────────────────────────────────────────────────┐
+│            BASE DE DONNÉES (Supabase / PostgreSQL)       │
+│  9 tables · Index de performance · Données persistantes  │
+└──────────────────────┬──────────────────────────────────┘
+                       │ WebSocket (Supabase Realtime)
+                       ▼
+              💬 Messagerie temps réel<button class="copy-btn" onclick="copyCode('code-archi',this)">Copier</button></pre></div>
+
+    <h3 class="reveal">Structure du projet</h3>
+    <div class="reveal"><pre id="code-tree">PIL1_2526_26/
+├── backend/
+│   ├── main.py              # Point d'entrée FastAPI + CORS
+│   ├── config.py            # Variables d'environnement (pydantic-settings)
+│   ├── database.py          # Connexion SQLAlchemy, session factory
+│   ├── schema.sql           # Script SQL de création de la BDD
+│   ├── requirements.txt     # Dépendances Python
+│   ├── routers/             # Endpoints par domaine
+│   │   ├── auth.py          # POST /register, /login, GET /me
+│   │   ├── users.py         # GET/PUT /users/me, skills, availabilities
+│   │   ├── posts.py         # CRUD /posts
+│   │   ├── matches.py       # GET /matches, accept, reject
+│   │   ├── chat.py          # Conversations & messages
+│   │   └── skills.py        # GET /skills
+│   ├── models/              # Modèles SQLAlchemy (ORM)
+│   ├── schemas/             # Schémas Pydantic (validation I/O)
+│   ├── services/            # Logique métier
+│   │   ├── auth_service.py      # JWT, hachage bcrypt
+│   │   ├── matching_service.py  # Algorithme de scoring
+│   │   └── chat_service.py      # Sécurité messagerie
+│   └── test/                # Suite de tests pytest
+│
+├── frontend/
+│   ├── index.html
+│   ├── vite.config.js
+│   └── src/
+│       ├── main.js
+│       ├── router/index.js  # Routes + guards JWT
+│       ├── store/index.js   # State management réactif (Pinia)
+│       ├── services/api.js  # Instance Axios configurée
+│       └── views/
+│           ├── LandingView.vue
+│           ├── LoginView.vue
+│           ├── RegisterView.vue
+│           └── DashboardView.vue  # 5 onglets
+│
+└── docs/                    # Documentation<button class="copy-btn" onclick="copyCode('code-tree',this)">Copier</button></pre></div>
+  </section>
+
+  <!-- ══ SECTION 4 — BASE DE DONNÉES ══ -->
+  <section id="bdd">
+    <div class="section-label reveal">04 — Base de données</div>
+    <h2 class="reveal">Schéma de la base de données</h2>
+    <p class="reveal">La base de données PostgreSQL (hébergée sur Supabase) contient <strong>9 tables</strong>. La table <strong>users</strong> est centrale ; toutes les autres en dépendent directement ou indirectement.</p>
+
+    <div class="db-grid reveal">
+      <div class="db-table">
+        <div class="db-table-name">users</div>
+        <div class="db-table-body">
+          <div class="schema-field"><span class="pk">PK</span> id SERIAL</div>
+          <div class="schema-field">first_name, last_name VARCHAR</div>
+          <div class="schema-field">email VARCHAR UNIQUE</div>
+          <div class="schema-field">phone_number VARCHAR UNIQUE</div>
+          <div class="schema-field">password_hash VARCHAR</div>
+          <div class="schema-field">field_of_study, level, bio</div>
+        </div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">skills</div>
+        <div class="db-table-body">
+          <div class="schema-field"><span class="pk">PK</span> id SERIAL</div>
+          <div class="schema-field">name VARCHAR UNIQUE</div>
+          <div class="schema-field">created_at TIMESTAMP DEFAULT NOW()</div>
+        </div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">user_skills</div>
+        <div class="db-table-body">
+          <div class="schema-field"><span class="pk">PK</span><span class="fk">FK</span> user_id → users</div>
+          <div class="schema-field"><span class="pk">PK</span><span class="fk">FK</span> skill_id → skills</div>
+          <div class="schema-field">proficiency 'strong'|'weak'</div>
+        </div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">user_availabilities</div>
+        <div class="db-table-body">
+          <div class="schema-field"><span class="pk">PK</span> id SERIAL</div>
+          <div class="schema-field"><span class="fk">FK</span> user_id → users</div>
+          <div class="schema-field">day_of_week VARCHAR</div>
+          <div class="schema-field">start_time, end_time TIME</div>
+        </div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">mentorship_posts</div>
+        <div class="db-table-body">
+          <div class="schema-field"><span class="pk">PK</span> id SERIAL</div>
+          <div class="schema-field"><span class="fk">FK</span> user_id → users</div>
+          <div class="schema-field">type 'offer'|'request'</div>
+          <div class="schema-field"><span class="fk">FK</span> skill_id → skills</div>
+          <div class="schema-field">mode 'online'|'offline'|'both'</div>
+          <div class="schema-field">is_active BOOLEAN</div>
+        </div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">post_availabilities</div>
+        <div class="db-table-body">
+          <div class="schema-field"><span class="pk">PK</span> id SERIAL</div>
+          <div class="schema-field"><span class="fk">FK</span> post_id → mentorship_posts</div>
+          <div class="schema-field">day_of_week, start_time, end_time</div>
+        </div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">matches</div>
+        <div class="db-table-body">
+          <div class="schema-field"><span class="pk">PK</span> id SERIAL</div>
+          <div class="schema-field"><span class="fk">FK</span> mentor_id → users</div>
+          <div class="schema-field"><span class="fk">FK</span> mentee_id → users</div>
+          <div class="schema-field"><span class="fk">FK</span> skill_id → skills</div>
+          <div class="schema-field">score DECIMAL(5,2)</div>
+          <div class="schema-field">status 'pending'|'accepted'|'rejected'</div>
+        </div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">conversations</div>
+        <div class="db-table-body">
+          <div class="schema-field"><span class="pk">PK</span> id SERIAL</div>
+          <div class="schema-field"><span class="fk">FK</span> match_id → matches (UNIQUE)</div>
+          <div class="schema-field">created_at, updated_at TIMESTAMP</div>
+        </div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">messages</div>
+        <div class="db-table-body">
+          <div class="schema-field"><span class="pk">PK</span> id SERIAL</div>
+          <div class="schema-field"><span class="fk">FK</span> conversation_id → conversations</div>
+          <div class="schema-field"><span class="fk">FK</span> sender_id → users</div>
+          <div class="schema-field">content TEXT</div>
+          <div class="schema-field">is_read BOOLEAN</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="reveal">Relations principales</h3>
+    <div class="reveal"><pre>users ──(1:N)→ user_skills ←(1:N)── skills
+users ──(1:N)→ user_availabilities
+users ──(1:N)→ mentorship_posts ──(1:N)→ post_availabilities
+users(mentor) ──(1:N)→ matches ←(1:N)── users(mentee)
+matches ──(1:1)→ conversations ──(1:N)→ messages</pre></div>
+
+    <h3 class="reveal">Algorithme de matching — Score de compatibilité</h3>
+    <p class="reveal">Le cœur de la plateforme. Il calcule un score de compatibilité sur <strong>100 points</strong> pour chaque paire mentor-mentoré selon 3 critères cumulables. Seuls les matches avec un score <strong>≥ 40 points</strong> sont proposés, triés par score décroissant.</p>
+
+    <div class="criteria-row reveal">
+      <div class="criterion">
+        <div class="pts">40</div>
+        <h4>Compétences</h4>
+        <p>Le mentor a la matière en <code>strong</code>, le mentoré l'a en <code>weak</code> → correspondance parfaite.</p>
+      </div>
+      <div class="criterion">
+        <div class="pts">30</div>
+        <h4>Disponibilités</h4>
+        <p>+10 pts par créneau horaire commun entre mentor et mentoré, plafonné à 30 pts.</p>
+      </div>
+      <div class="criterion">
+        <div class="pts">30</div>
+        <h4>Filière / Niveau</h4>
+        <p>Même filière → +30 pts. Filières proches (ex. IA/IM) → +15 pts. Différentes → +0 pt.</p>
+      </div>
+    </div>
+
+    <div class="score-list reveal" id="score-bars">
+      <div>
+        <div class="score-label">Compatibilité des compétences <span>40 pts</span></div>
+        <div class="score-track"><div class="score-fill purple" data-target="40"></div></div>
+      </div>
+      <div>
+        <div class="score-label">Disponibilités communes (max 3 créneaux) <span>30 pts</span></div>
+        <div class="score-track"><div class="score-fill teal" data-target="30"></div></div>
+      </div>
+      <div>
+        <div class="score-label">Proximité de filière <span>30 pts</span></div>
+        <div class="score-track"><div class="score-fill gold" data-target="30"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 5 — API REST ══ -->
+  <section id="api">
+    <div class="section-label reveal">05 — API REST</div>
+    <h2 class="reveal">Documentation de l'API</h2>
+    <p class="reveal">L'API REST FastAPI expose tous ses endpoints via <strong>Swagger UI</strong> sur <code>/docs</code>. Les routes privées requièrent un header <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+
+    <h3 class="reveal">Authentification</h3>
+    <div class="endpoints-grid reveal">
+      <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/api/auth/register</span><span class="endpoint-desc">Inscription d'un nouvel utilisateur</span></div>
+      <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/api/auth/login</span><span class="endpoint-desc">Connexion → retourne un token JWT</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/auth/me<span class="lock">🔒</span></span><span class="endpoint-desc">Profil de l'utilisateur connecté</span></div>
+    </div>
+
+    <h3 class="reveal">Utilisateurs &amp; Compétences</h3>
+    <div class="endpoints-grid reveal">
+      <div class="endpoint"><span class="method put">PUT</span><span class="endpoint-path">/api/users/me<span class="lock">🔒</span></span><span class="endpoint-desc">Modifier son profil</span></div>
+      <div class="endpoint"><span class="method put">PUT</span><span class="endpoint-path">/api/users/me/skills<span class="lock">🔒</span></span><span class="endpoint-desc">Mettre à jour les compétences (strong/weak)</span></div>
+      <div class="endpoint"><span class="method put">PUT</span><span class="endpoint-path">/api/users/me/availabilities<span class="lock">🔒</span></span><span class="endpoint-desc">Configurer les créneaux de disponibilité</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/skills</span><span class="endpoint-desc">Liste de toutes les compétences disponibles</span></div>
+    </div>
+
+    <h3 class="reveal">Posts de mentorat</h3>
+    <div class="endpoints-grid reveal">
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/posts</span><span class="endpoint-desc">Tous les posts actifs (filtrable)</span></div>
+      <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/api/posts<span class="lock">🔒</span></span><span class="endpoint-desc">Créer une offre ou demande de mentorat</span></div>
+      <div class="endpoint"><span class="method put">PUT</span><span class="endpoint-path">/api/posts/{id}<span class="lock">🔒</span></span><span class="endpoint-desc">Modifier un post</span></div>
+    </div>
+
+    <h3 class="reveal">Matching &amp; Messagerie</h3>
+    <div class="endpoints-grid reveal">
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/matches<span class="lock">🔒</span></span><span class="endpoint-desc">Matches calculés par l'algorithme</span></div>
+      <div class="endpoint"><span class="method put">PUT</span><span class="endpoint-path">/api/matches/{id}/accept<span class="lock">🔒</span></span><span class="endpoint-desc">Accepter → crée une conversation</span></div>
+      <div class="endpoint"><span class="method put">PUT</span><span class="endpoint-path">/api/matches/{id}/reject<span class="lock">🔒</span></span><span class="endpoint-desc">Refuser un match</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/conversations<span class="lock">🔒</span></span><span class="endpoint-desc">Conversations avec messages non-lus</span></div>
+      <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/api/conversations/{id}/messages<span class="lock">🔒</span></span><span class="endpoint-desc">Envoyer un message</span></div>
+    </div>
+
+    <h3 class="reveal">Tests</h3>
+    <div class="reveal"><pre id="code-tests">cd backend
+source .venv/bin/activate
+pytest test/ -v                        # Tous les tests
+pytest test/test_routes.py -v          # Un fichier spécifique
+pytest test/ --cov=. --cov-report=html # Avec couverture de code<button class="copy-btn" onclick="copyCode('code-tests',this)">Copier</button></pre></div>
+  </section>
+
+  <!-- ══ SECTION 6 — DÉPLOIEMENT ══ -->
+  <section id="deploiement">
+    <div class="section-label reveal">06 — Déploiement</div>
+    <h2 class="reveal">Déploiement &amp; instructions</h2>
+
+    <div class="deploy-live-banner reveal">
+      <div class="deploy-live-dot"></div>
+      <div class="deploy-live-text">
+        <strong>Application déployée en ligne ✓</strong>
+        <a href="https://ifri-mentorlink.vercel.app/" target="_blank">https://ifri-mentorlink.vercel.app/</a>
+      </div>
+      <a href="https://ifri-mentorlink.vercel.app/" target="_blank" class="link-btn" style="flex-shrink:0">Ouvrir ↗</a>
+    </div>
+
+    <div class="info-row reveal">
+      <div class="info-box"><div class="label">Dépôt GitHub</div><div class="value"><a href="https://github.com/PL1G26/PIL1_2526_26" target="_blank" style="color:var(--accent);text-decoration:none">PL1G26/PIL1_2526_26</a></div></div>
+      <div class="info-box"><div class="label">Python requis</div><div class="value">≥ 3.11</div></div>
+      <div class="info-box"><div class="label">Node.js requis</div><div class="value">≥ 18</div></div>
+      <div class="info-box"><div class="label">Base de données</div><div class="value">PostgreSQL ≥ 14 ou Supabase</div></div>
+    </div>
+
+    <h3 class="reveal">Étape 1 — Cloner le dépôt</h3>
+    <div class="reveal"><pre id="code1">git clone https://github.com/PL1G26/PIL1_2526_26.git
+cd PIL1_2526_26<button class="copy-btn" onclick="copyCode('code1',this)">Copier</button></pre></div>
+
+    <h3 class="reveal">Étape 2 — Initialiser la base de données</h3>
+    <p class="reveal"><strong>Option A — Supabase (recommandé) :</strong> créer un projet sur supabase.com, coller le contenu de <code>backend/schema.sql</code> dans l'éditeur SQL, puis récupérer l'URL et les clés.</p>
+    <div class="reveal"><pre id="code-db"># Option B — PostgreSQL local
+psql -U postgres -c "CREATE DATABASE ifri_mentorlink;"
+psql -U postgres -d ifri_mentorlink -f backend/schema.sql<button class="copy-btn" onclick="copyCode('code-db',this)">Copier</button></pre></div>
+
+    <h3 class="reveal">Étape 3 — Configurer et lancer le backend</h3>
+    <div class="reveal"><pre id="code2">cd backend
+
+# Créer et activer l'environnement virtuel
+python -m venv .venv
+source .venv/bin/activate        # Linux / macOS
+# .venv\Scripts\activate         # Windows
+
+# Installer les dépendances
+pip install -r requirements.txt
+
+# Configurer les variables d'environnement
+cp .env.example .env
+# → Éditer .env : DATABASE_URL, SECRET_KEY, SUPABASE_URL, SUPABASE_ANON_KEY
+
+# Lancer le serveur de développement
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+# API : http://localhost:8000
+# Swagger UI : http://localhost:8000/docs<button class="copy-btn" onclick="copyCode('code2',this)">Copier</button></pre></div>
+
+    <h3 class="reveal">Étape 4 — Lancer le frontend</h3>
+    <div class="reveal"><pre id="code3">cd frontend
+npm install
+cp .env.example .env
+# → Éditer .env : VITE_API_BASE_URL, VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+npm run dev
+# Interface : http://localhost:5173<button class="copy-btn" onclick="copyCode('code3',this)">Copier</button></pre></div>
+
+    <h3 class="reveal">Étape 5 — Build de production</h3>
+    <div class="reveal"><pre id="code-prod"># Frontend : génère les assets statiques dans dist/
+cd frontend && npm run build
+
+# Backend : lancer avec Gunicorn (4 workers)
+cd backend
+gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000<button class="copy-btn" onclick="copyCode('code-prod',this)">Copier</button></pre></div>
+
+    <h3 class="reveal">Variables d'environnement</h3>
+    <div class="stack-table-wrap reveal">
+      <table class="stack-table">
+        <thead><tr><th>Variable</th><th>Description</th><th>Exemple</th></tr></thead>
+        <tbody>
+          <tr><td><code>DATABASE_URL</code></td><td style="color:var(--muted)">URL de connexion PostgreSQL</td><td style="color:var(--dim);font-size:.78rem">postgresql://user:pass@host:5432/db</td></tr>
+          <tr><td><code>SECRET_KEY</code></td><td style="color:var(--muted)">Clé secrète pour signer les JWT</td><td style="color:var(--dim);font-size:.78rem">python -c "import secrets; print(secrets.token_urlsafe(32))"</td></tr>
+          <tr><td><code>SUPABASE_URL</code></td><td style="color:var(--muted)">URL du projet Supabase</td><td style="color:var(--dim);font-size:.78rem">https://xxxx.supabase.co</td></tr>
+          <tr><td><code>SUPABASE_ANON_KEY</code></td><td style="color:var(--muted)">Clé anonyme Supabase (Realtime)</td><td style="color:var(--dim);font-size:.78rem">eyJhbGci...</td></tr>
+          <tr><td><code>TOKEN_EXPIRE_HOURS</code></td><td style="color:var(--muted)">Durée de validité du JWT en heures</td><td style="color:var(--dim);font-size:.78rem">24</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="reveal" style="font-size:.82rem;">⚠️ Le fichier <code>.env</code> est ignoré par Git. Ne jamais committer vos secrets en clair.</p>
+  </section>
+
+  <!-- ══ SECTION 7 — MANUEL ══ -->
+  <section id="manuel">
+    <div class="section-label reveal">07 — Manuel utilisateur</div>
+    <h2 class="reveal">Manuel d'utilisation</h2>
+    <p class="reveal">Ce manuel décrit le parcours complet d'un étudiant sur IFRI_MentorLink, de l'inscription jusqu'à la messagerie en temps réel.</p>
+
+    <div class="steps-list reveal">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Inscription</h4>
+          <p>Rendez-vous sur la page d'accueil et cliquez sur <strong>S'inscrire</strong>. Renseignez vos informations : nom, prénom, e-mail, numéro de téléphone (<code>+229...</code>), mot de passe, filière et niveau. Indiquez vos compétences maîtrisées (points forts) et les matières où vous avez besoin d'aide (points faibles), ainsi que vos disponibilités hebdomadaires. L'e-mail et le numéro doivent être uniques — un token JWT est généré automatiquement.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Connexion</h4>
+          <p>Connectez-vous avec votre adresse e-mail (ou numéro de téléphone) et votre mot de passe. Après connexion, vous êtes redirigé vers votre tableau de bord — le token JWT est persisté et maintient la session après rechargement de page.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Gérer son profil</h4>
+          <p>Depuis l'onglet <strong>Profil</strong> du dashboard, modifiez vos informations (bio, filière, niveau, photo), ajoutez ou retirez des compétences — <em>Point fort</em> (je peux enseigner) ou <em>Point faible</em> (j'ai besoin d'aide) — et configurez vos disponibilités horaires : jour, heure de début et de fin.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Publier une offre ou une demande de mentorat</h4>
+          <p>Dans l'onglet <strong>Mes Posts</strong>, cliquez sur <em>Créer un post</em>. Choisissez le type (<strong>Offre</strong> si vous pouvez aider, <strong>Demande</strong> si vous avez besoin d'aide), la matière concernée, le format (présentiel / en ligne / les deux) et vos créneaux. Un utilisateur peut avoir plusieurs posts actifs simultanément.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>Explorer les offres et demandes</h4>
+          <p>L'onglet <strong>Rechercher</strong> affiche tous les posts actifs de la communauté avec filtres par matière, type ou format. Vous pouvez répondre directement à une offre ou demande qui vous correspond.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <h4>Consulter les correspondances (matching)</h4>
+          <p>L'onglet <strong>Correspondances</strong> affiche les paires mentor-mentoré calculées automatiquement. Chaque carte indique le nom, les compétences communes, les créneaux partagés et un <strong>score sur 100</strong>. Cliquez sur <em>Accepter</em> pour confirmer la mise en relation ou <em>Refuser</em> pour la rejeter.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">7</div>
+        <div class="step-content">
+          <h4>Messagerie instantanée</h4>
+          <p>Une fois un match accepté, une conversation est créée automatiquement. Accédez à l'onglet <strong>Messages</strong> pour discuter en temps réel — les messages arrivent instantanément via Supabase Realtime. L'historique complet est conservé. Seules les conversations issues de matches acceptés y figurent.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;" class="reveal">
+      <a class="link-btn" href="https://ifri-mentorlink.vercel.app/" target="_blank">🌐 Application en ligne</a>
+      <a class="link-btn" href="https://github.com/PL1G26/PIL1_2526_26" target="_blank" style="color:var(--accent2);border-color:rgba(62,207,178,.3);background:rgba(62,207,178,.08);">🔗 Dépôt GitHub</a>
+    </div>
+  </section>
+
+</div>
+
+<div class="container">
+  <div class="alert reveal" style="margin-bottom:3rem;background:rgba(62,207,178,.07);border-color:rgba(62,207,178,.3);font-size:.9rem;">
+    <strong style="color:var(--accent2)">Remerciements</strong> — L'équipe remercie <strong>M. Ratheil HOUNDJI</strong>, <strong>M. Armand ACCROMBESSI</strong> et <strong>Mme Maryse GAHOU</strong> pour leur encadrement, leur disponibilité et leurs retours tout au long du projet.
+  </div>
+</div>
+
+<footer>
+  <p><strong>IFRI_MentorLink</strong> — Projet intégrateur PIL1 2025-2026</p>
+  <p style="margin-top:.4rem">Groupe PIL1_2526_26 · Institut de Formation et de Recherche en Informatique — Université d'Abomey-Calavi</p>
+  <p style="margin-top:.4rem">Supervision : M. Ratheil HOUNDJI · Encadrants : M. Armand ACCROMBESSI &amp; Mme Maryse GAHOU</p>
+  <p style="margin-top:.75rem">
+    <a href="https://ifri-mentorlink.vercel.app/" target="_blank">🌐 ifri-mentorlink.vercel.app</a>
+    &nbsp;&nbsp;·&nbsp;&nbsp;
+    <a href="https://github.com/PL1G26/PIL1_2526_26" target="_blank">github.com/PL1G26/PIL1_2526_26</a>
+  </p>
+</footer>
+
+<script>
+// PARTICLES
+const canvas=document.getElementById('particles-canvas'),ctx=canvas.getContext('2d');
+let W,H,particles=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',()=>{resize();initP();});
+function initP(){particles=[];const n=Math.floor(W*H/13000);for(let i=0;i<n;i++)particles.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+.5,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,a:Math.random()*.45+.2});}
+initP();
+let mouse={x:W/2,y:H/2};
+window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  for(let i=0;i<particles.length;i++){
+    const p=particles[i];
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(124,106,247,${p.a})`;ctx.fill();
+    for(let j=i+1;j<particles.length;j++){
+      const q=particles[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<115){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);
+        ctx.strokeStyle=`rgba(124,106,247,${.18*(1-d/115)})`;ctx.lineWidth=.6;ctx.stroke();}
+    }
+    const mx=mouse.x-p.x,my=mouse.y-p.y,md=Math.sqrt(mx*mx+my*my);
+    if(md<150){p.vx+=mx/md*.015;p.vy+=my/md*.015;
+      const sp=Math.sqrt(p.vx*p.vx+p.vy*p.vy);if(sp>.8){p.vx=p.vx/sp*.8;p.vy=p.vy/sp*.8;}}
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+
+// CURSOR GLOW
+const glow=document.getElementById('cursor-glow');
+window.addEventListener('mousemove',e=>{glow.style.left=e.clientX+'px';glow.style.top=e.clientY+'px';});
+
+// PROGRESS BAR
+const bar=document.getElementById('progress-bar');
+window.addEventListener('scroll',()=>{bar.style.width=(window.scrollY/(document.body.scrollHeight-window.innerHeight)*100)+'%';});
+
+// BACK TO TOP
+const bt=document.getElementById('back-top');
+window.addEventListener('scroll',()=>bt.classList.toggle('show',window.scrollY>400));
+bt.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+// SCROLL REVEAL
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// ACTIVE NAV
+const secs=document.querySelectorAll('section[id]'),navAs=document.querySelectorAll('.nav-links a');
+const nObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){navAs.forEach(a=>a.classList.remove('active'));const l=document.querySelector('.nav-links a[href="#'+e.target.id+'"]');if(l)l.classList.add('active');}});},{rootMargin:'-40% 0px -55% 0px'});
+secs.forEach(s=>nObs.observe(s));
+
+// TYPED EFFECT
+const words=['MentorLink','Mentorat','Connexion','MentorLink'];
+let wi=0,ci=0,del=false;
+const tel=document.getElementById('typed-word');
+function type(){
+  const w=words[wi];
+  if(!del){tel.textContent=w.slice(0,++ci);if(ci===w.length){if(wi===words.length-1)return;setTimeout(()=>{del=true;type();},1800);return;}}
+  else{tel.textContent=w.slice(0,--ci);if(ci===0){del=false;wi=(wi+1)%words.length;}}
+  setTimeout(type,del?55:90);
+}
+setTimeout(type,900);
+
+// SCORE BARS
+const sb=document.getElementById('score-bars');
+if(sb){const so=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('.score-fill').forEach(f=>{f.style.width=f.dataset.target+'%';});so.unobserve(e.target);}});},{threshold:.3});so.observe(sb);}
+
+// COPY CODE
+function copyCode(id,btn){
+  const pre=document.getElementById(id);
+  const text=Array.from(pre.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();
+  navigator.clipboard.writeText(text).then(()=>{btn.textContent='✓ Copié';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copier';btn.classList.remove('copied');},2000);});
+}
+</script>
+</body>
+</html>
