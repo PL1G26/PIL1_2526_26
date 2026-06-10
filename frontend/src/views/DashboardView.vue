@@ -308,6 +308,26 @@
                 <div style="display:flex;align-items:center;">
                   <span class="tag tag-green" style="font-size:12px;">{{ match.skill?.name || store.skills.find(s => s.id === match.skill_id)?.name }}</span>
                 </div>
+                <!-- Disponibilités -->
+                <div style="display:flex;flex-direction:column; justify-content:center;">
+                  <div style="font-size: 11px; color: var(--text2); margin-bottom: 4px;">{{ match.offer_post_id ? "Dispo pour l'offre :" : "Dispo du mentor :" }}</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:4px;">
+                    <template v-if="getMatchAvailabilities(match)?.length">
+                      <template v-if="getMatchAvailabilities(match).length <= 2">
+                        <span v-for="av in getMatchAvailabilities(match)" :key="av.id" style="background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-size: 11px; border: 1px solid var(--border);">
+                          {{ formatDay(av.day_of_week) }} {{ av.start_time.slice(0,5) }} - {{ av.end_time.slice(0,5) }}
+                        </span>
+                      </template>
+                      <select v-else style="font-size: 11px; padding: 2px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface2); max-width: 180px;">
+                        <option value="">{{ getMatchAvailabilities(match).length }} créneaux disponibles...</option>
+                        <option v-for="av in getMatchAvailabilities(match)" :key="av.id" :value="av.id" disabled>
+                          {{ formatDay(av.day_of_week) }} {{ av.start_time.slice(0,5) }} - {{ av.end_time.slice(0,5) }}
+                        </option>
+                      </select>
+                    </template>
+                    <span v-else style="font-size: 11px; color: var(--text3);">Non précisée</span>
+                  </div>
+                </div>
               </div>
               <div style="text-align: right; flex-shrink:0;">
                 <div style="margin-bottom: 8px;">
@@ -472,6 +492,26 @@
                 <!-- Compétence -->
                 <div style="display:flex;align-items:center;">
                   <span class="tag" style="font-size:12px;">{{ match.skill?.name || store.skills.find(s => s.id === match.skill_id)?.name }}</span>
+                </div>
+                <!-- Disponibilités -->
+                <div style="display:flex;flex-direction:column; justify-content:center;">
+                  <div style="font-size: 11px; color: var(--text2); margin-bottom: 4px;">{{ match.offer_post_id ? "Dispo pour l'offre :" : "Dispo du mentor :" }}</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:4px;">
+                    <template v-if="getMatchAvailabilities(match)?.length">
+                      <template v-if="getMatchAvailabilities(match).length <= 2">
+                        <span v-for="av in getMatchAvailabilities(match)" :key="av.id" style="background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-size: 11px; border: 1px solid var(--border);">
+                          {{ formatDay(av.day_of_week) }} {{ av.start_time.slice(0,5) }} - {{ av.end_time.slice(0,5) }}
+                        </span>
+                      </template>
+                      <select v-else style="font-size: 11px; padding: 2px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface2); max-width: 180px;">
+                        <option value="">{{ getMatchAvailabilities(match).length }} créneaux disponibles...</option>
+                        <option v-for="av in getMatchAvailabilities(match)" :key="av.id" :value="av.id" disabled>
+                          {{ formatDay(av.day_of_week) }} {{ av.start_time.slice(0,5) }} - {{ av.end_time.slice(0,5) }}
+                        </option>
+                      </select>
+                    </template>
+                    <span v-else style="font-size: 11px; color: var(--text3);">Non précisée</span>
+                  </div>
                 </div>
               </div>
               <div style="text-align: right; flex-shrink:0;">
@@ -835,6 +875,33 @@ const formatDay = (dayEn) => {
     'Thursday': 'Jeudi', 'Friday': 'Vendredi', 'Saturday': 'Samedi', 'Sunday': 'Dimanche'
   }
   return map[dayEn] || dayEn
+}
+
+const getMatchAvailabilities = (match) => {
+  if (match.offer_post_id) {
+    const post = store.posts.find(p => p.id === match.offer_post_id)
+    return post?.availabilities || []
+  } else {
+    // Profile direct
+    if (mentorAvailabilitiesCache[match.mentor_id] === undefined) {
+      fetchMentorAvailabilities(match.mentor_id)
+      return []
+    }
+    return mentorAvailabilitiesCache[match.mentor_id] || []
+  }
+}
+
+const mentorAvailabilitiesCache = reactive({})
+
+const fetchMentorAvailabilities = async (mentorId) => {
+  if (mentorAvailabilitiesCache[mentorId] !== undefined) return
+  mentorAvailabilitiesCache[mentorId] = null // loading state
+  const res = await store.fetchUserProfile(mentorId)
+  if (res && res.success) {
+    mentorAvailabilitiesCache[mentorId] = res.data.availabilities || []
+  } else {
+    mentorAvailabilitiesCache[mentorId] = []
+  }
 }
 
 // Loading States
