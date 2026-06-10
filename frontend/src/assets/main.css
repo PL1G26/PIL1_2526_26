@@ -1522,3 +1522,74 @@ select[style*="border-color:var(--red)"] {
 /* Scrollbar en mode sombre */
 [data-theme="dark"] ::-webkit-scrollbar-track { background: var(--surface2); }
 [data-theme="dark"] ::-webkit-scrollbar-thumb { background: #444; }
+
+/* =============================================================
+   Système de Notifications Temps Réel
+   ============================================================= */
+
+/* Badge de non-lus avec animation pulse */
+.badge-count {
+  animation: badge-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes badge-pop {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Dot de non-lu dans la conv-list avec animation */
+.unread-dot {
+  animation: unread-pulse 2s ease-in-out infinite;
+}
+@keyframes unread-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(29, 158, 117, 0.5); }
+  50%       { box-shadow: 0 0 0 4px rgba(29, 158, 117, 0); }
+}
+
+/* Badge de non-lus "vibrant" quand il y en a beaucoup */
+.badge-count.pulse {
+  animation: badge-vibrate 0.5s ease 0s 2;
+}
+@keyframes badge-vibrate {
+  0%,100% { transform: rotate(0deg); }
+  20%     { transform: rotate(-8deg) scale(1.1); }
+  40%     { transform: rotate(8deg) scale(1.1); }
+  60%     { transform: rotate(-5deg); }
+  80%     { transform: rotate(5deg); }
+}
+
+/* Indicateur de connexion SSE dans le chat header */
+.sse-status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+  vertical-align: middle;
+  transition: background 0.4s;
+}
+.sse-status-dot.connected {
+  background: var(--brand);
+  animation: sse-connected-pulse 3s ease-in-out infinite;
+}
+.sse-status-dot.disconnected {
+  background: #f59e0b;
+}
+@keyframes sse-connected-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(29,158,117,0.6); }
+  50%       { opacity: 0.8; box-shadow: 0 0 0 4px rgba(29,158,117,0); }
+}
+
+/* Animation d'entrée pour les nouvelles conv-items (message reçu) */
+.conv-item.new-message-flash {
+  animation: conv-flash 0.6s ease;
+}
+@keyframes conv-flash {
+  0%   { background: rgba(29,158,117,0.25); }
+  100% { background: transparent; }
+}
+
+/* Mode sombre — toast container */
+[data-theme="dark"] #notif-toast-container > div {
+  background: var(--surface, #1e2029) !important;
+  border-color: var(--border, #2e303a) !important;
+  color: var(--text, #e2e8f0) !important;
+}

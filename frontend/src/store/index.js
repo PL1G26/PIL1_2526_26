@@ -1,5 +1,6 @@
 import { reactive, watch } from 'vue'
 import api from '../services/api'
+import notificationService from '../services/notificationService'
 
 const loadCache = (key, defaultVal) => {
   try {
@@ -33,6 +34,8 @@ export const store = reactive({
           this.fetchDashboardData()
         ])
         this.user = userResponse.data
+        // Démarrer le service de notifications en temps réel
+        notificationService.start(this)
       } catch (error) {
         console.error("Auth init error:", error)
         this.logout()
@@ -52,6 +55,8 @@ export const store = reactive({
           this.fetchDashboardData()
         ])
         this.user = userRes.data
+        // Démarrer le service de notifications en temps réel
+        notificationService.start(this)
         return { success: true }
       }
       return { success: false, message: 'Invalid response from server' }
@@ -71,6 +76,8 @@ export const store = reactive({
   },
 
   logout() {
+    // Arrêter le service SSE avant de vider l'état
+    notificationService.stop()
     this.user = null
     this.token = null
     this.posts = []
@@ -168,6 +175,9 @@ export const store = reactive({
       const convIndex = this.conversations.findIndex(c => c.id === convId)
       if (convIndex !== -1) {
         this.conversations[convIndex].messages = res.data.messages
+        // Marquer comme lu automatiquement
+        notificationService.markConversationRead(convId)
+        this.conversations[convIndex].unread_count = 0
       }
     } catch(e) {
       console.error("Error fetching messages", e)
