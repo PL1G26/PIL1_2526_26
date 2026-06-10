@@ -1,8 +1,13 @@
 <template>
 <div id="view-dashboard" v-if="store.user">
   <nav class="navbar">
-    <div class="navbar-brand" @click="store.activeTab = 'home'">
-      <span class="logo-dot"></span> IFRI MentorLink
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="dashboard-nav-hamburger" @click="sidebarOpen = !sidebarOpen" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="navbar-brand" @click="store.activeTab = 'home'">
+        <span class="logo-dot"></span> IFRI MentorLink
+      </div>
     </div>
     <div class="navbar-links">
       <span style="font-size:13px;color:var(--text2);display:flex;align-items:center;gap:4px;">Bonjour, <strong>{{ store.user.first_name }}</strong> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v4"/><path d="M14 10V5a2 2 0 0 0-4 0v5"/><path d="M10 10.5V4a2 2 0 0 0-4 0v10.5"/><path d="M6 14.5V11a2 2 0 0 0-4 0v5a8 8 0 0 0 16 0V11a2 2 0 0 0-4 0v-1"/></svg></span>
@@ -13,8 +18,11 @@
     </div>
   </nav>
 
+  <!-- Overlay sidebar mobile -->
+  <div class="sidebar-overlay" :class="{ open: sidebarOpen }" @click="sidebarOpen = false"></div>
+
   <div class="dashboard-layout">
-    <aside class="sidebar">
+    <aside class="sidebar" :class="{ open: sidebarOpen }">
       <div class="sidebar-user">
         <div class="avatar av-green" v-if="!photoOk('sidebar-user', store.user?.profile_photo)">{{ getInitials(store.user) }}</div>
         <img v-else :src="store.user.profile_photo" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" @error="onPhotoError('sidebar-user')" />
@@ -24,36 +32,36 @@
         </div>
       </div>
       <nav class="sidebar-nav">
-        <button class="sidebar-item" :class="{active: store.activeTab === 'home'}" @click="store.activeTab = 'home'">
+        <button class="sidebar-item" :class="{active: store.activeTab === 'home'}" @click="store.activeTab = 'home'; sidebarOpen = false">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
           Tableau de bord
         </button>
         <div class="sidebar-section-label">Mon Profil</div>
-        <button class="sidebar-item" :class="{active: store.activeTab === 'profile'}" @click="store.activeTab = 'profile'">
+        <button class="sidebar-item" :class="{active: store.activeTab === 'profile'}" @click="store.activeTab = 'profile'; sidebarOpen = false">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
           Profil & Compétences
         </button>
         <div class="sidebar-section-label">Mentorat</div>
-        <button class="sidebar-item" :class="{active: store.activeTab === 'posts'}" @click="store.activeTab = 'posts'">
+        <button class="sidebar-item" :class="{active: store.activeTab === 'posts'}" @click="store.activeTab = 'posts'; sidebarOpen = false">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line></svg>
           Mes Posts
         </button>
-        <button class="sidebar-item" :class="{active: store.activeTab === 'matches'}" @click="store.activeTab = 'matches'">
+        <button class="sidebar-item" :class="{active: store.activeTab === 'matches'}" @click="store.activeTab = 'matches'; sidebarOpen = false">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"></line></svg>
           Correspondances
           <span class="badge-count" v-if="pendingMatchesCount > 0">{{ pendingMatchesCount }}</span>
         </button>
-        <button class="sidebar-item" :class="{active: store.activeTab === 'chat'}" @click="store.activeTab = 'chat'">
+        <button class="sidebar-item" :class="{active: store.activeTab === 'chat'}" @click="store.activeTab = 'chat'; sidebarOpen = false">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path></svg>
           Messagerie
           <span class="badge-count" v-if="totalUnreadMessages > 0">{{ totalUnreadMessages }}</span>
         </button>
         <div class="sidebar-section-label">Explorer</div>
-        <button class="sidebar-item" :class="{active: store.activeTab === 'explore'}" @click="store.activeTab = 'explore'">
+        <button class="sidebar-item" :class="{active: store.activeTab === 'explore'}" @click="store.activeTab = 'explore'; sidebarOpen = false">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" x2="16.65" y1="21" y2="16.65"></line></svg>
           Rechercher
         </button>
-        <button class="sidebar-item" :class="{active: store.activeTab === 'history'}" @click="store.activeTab = 'history'">
+        <button class="sidebar-item" :class="{active: store.activeTab === 'history'}" @click="store.activeTab = 'history'; sidebarOpen = false">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
           Historique
         </button>
@@ -652,6 +660,9 @@ import { useRouter } from 'vue-router'
 import { store } from '../store'
 
 const router = useRouter()
+
+// Sidebar mobile toggle
+const sidebarOpen = ref(false)
 
 // Gestion des photos introuvables : stocke les clés d'images en erreur
 const brokenPhotos = reactive(new Set())

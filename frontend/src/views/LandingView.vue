@@ -5,10 +5,13 @@
 <div class="navbar-brand" @click="$router.push('/')">
 <span class="logo-dot"></span> IFRI MentorLink
     </div>
-<div class="navbar-links">
-<button class="btn btn-ghost" @click="scrollToSection('features')">Fonctionnalités</button>
-<button class="btn btn-ghost" @click="scrollToSection('about')">À propos</button>
-<button class="btn btn-ghost" @click="scrollToSection('contact')">Contact</button>
+<button class="navbar-hamburger" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Menu" aria-expanded="mobileMenuOpen">
+  <span></span><span></span><span></span>
+</button>
+<div class="navbar-links" :class="{ open: mobileMenuOpen }">
+<button class="btn btn-ghost" @click="scrollToSection('features'); mobileMenuOpen=false">Fonctionnalités</button>
+<button class="btn btn-ghost" @click="scrollToSection('about'); mobileMenuOpen=false">À propos</button>
+<button class="btn btn-ghost" @click="scrollToSection('contact'); mobileMenuOpen=false">Contact</button>
 <button aria-label="Basculer mode sombre/clair" class="theme-toggle" id="theme-btn" @click="store.toggleTheme()" title="Changer le thème">
 <span id="theme-icon" style="display:flex;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span>
 </button>
@@ -297,6 +300,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { store } from '../store'
+
+const mobileMenuOpen = ref(false)
 
 const router = useRouter()
 
