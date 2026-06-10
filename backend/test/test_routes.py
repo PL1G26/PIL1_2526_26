@@ -7,10 +7,6 @@ Ce script utilise TestClient pour appeler les routes du backend
 sans lancer un serveur HTTP séparé.
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
 import random
 import time
 from fastapi.testclient import TestClient
