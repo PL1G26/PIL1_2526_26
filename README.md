@@ -33,6 +33,7 @@
 - **Accepter ou refuser des correspondances** (matches)
 - **Échanger des messages** dans des conversations liées aux matches acceptés
 - **Gérer son profil** : compétences (points forts / lacunes), disponibilités hebdomadaires, bio
+- **Notifications en temps réel** : alertes in-app (toasts, son) et notifications système (navigateur/OS) à la réception de nouveaux messages grâce aux Server-Sent Events (SSE)
 
 ---
 
@@ -331,6 +332,16 @@ L'endpoint `GET /api/matches/` :
 | `GET` | `/api/conversations/{id}/messages` | Messages d'une conversation |
 | `POST` | `/api/conversations/{id}/messages` | Envoyer un message |
 | `POST` | `/api/conversations/direct` | Créer une conv. directe (sans match préalable) |
+| `PUT` | `/api/conversations/{id}/read` | Marquer les messages d'une conversation comme lus |
+
+---
+
+#### Notifications (SSE) — `/api/notifications`
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| `GET` | `/api/notifications/stream` | Flux Server-Sent Events (SSE) pour les alertes en temps réel |
+| `GET` | `/api/notifications/unread-count` | Récupère le compteur de messages non-lus |
 
 ---
 
@@ -442,7 +453,7 @@ Vue principale post-connexion, organisée en **5 onglets** :
 | **Rechercher** | Exploration des posts publics, filtres type/compétence, messagerie directe |
 | **Mes Posts** | CRUD des offres et demandes personnelles |
 | **Correspondances** | Matches calculés, acceptation/refus, disponibilités du mentor |
-| **Messages** | Interface de messagerie en temps réel par conversation |
+| **Messages** | Interface de messagerie avec notifications en temps réel (toasts, son et alertes OS) via SSE |
 
 ##### `LandingView.vue`
 Page d'accueil publique avec présentation de la plateforme, CTA vers inscription/connexion.
