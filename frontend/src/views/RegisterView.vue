@@ -129,9 +129,9 @@ const loading = ref(false)
 const handleRegister = async () => {
   errorMessage.value = ''
   
-  const nameRegex = /^[A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s\-']*$/
+  const nameRegex = /^[A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s\-']+$/
   if (!nameRegex.test(formData.value.first_name) || !nameRegex.test(formData.value.last_name)) {
-    errorMessage.value = "Le prénom et le nom doivent commencer par une lettre majuscule et ne doivent pas contenir de caractères spéciaux."
+    errorMessage.value = "Le prénom et le nom doivent commencer par une lettre majuscule, contenir au moins deux lettres, et ne pas avoir de caractères spéciaux."
     return
   }
 
