@@ -35,7 +35,6 @@ share/python-wheels/
 *.egg
 MANIFEST
 .venv/
-mon_env/
 venv/
 ENV/
 env/
@@ -62,6 +61,7 @@ htmlcov/
 .tox/
 .hypothesis/
 .nose*
+pytest.ini
 
 # ──── DATABASE ────────────────────────────────────────────────
 *.db
@@ -81,6 +81,7 @@ logs/
 *~
 .DS_Store
 Thumbs.db
+docs
 
 # ──── OS ──────────────────────────────────────────────────────
 .DS_Store
