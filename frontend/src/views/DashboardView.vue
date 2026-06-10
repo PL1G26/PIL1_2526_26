@@ -518,12 +518,28 @@
         </select>
       </div>
       <div class="form-group">
+        <label>Créneau de disponibilité *</label>
+        <template v-if="store.user.availabilities && store.user.availabilities.length > 0">
+          <select v-model="newPost.availability_id" required>
+            <option value="">Choisir un créneau…</option>
+            <option v-for="av in store.user.availabilities" :key="av.id" :value="av.id">
+              {{ formatDay(av.day_of_week) }} {{ av.start_time.slice(0,5) }} — {{ av.end_time.slice(0,5) }}
+            </option>
+          </select>
+        </template>
+        <template v-else>
+          <div style="font-size: 13px; color: var(--error, #e74c3c); padding: 8px; background: var(--error-bg, #fdf0ef); border-radius: var(--radius);">
+            Vous n'avez encore aucune disponibilité. Veuillez en ajouter une dans votre profil d'abord.
+          </div>
+        </template>
+      </div>
+      <div class="form-group">
         <label>Description (optionnel)</label>
         <textarea v-model="newPost.description" placeholder="Ex : Je propose des sessions..." style="min-height:80px;"></textarea>
       </div>
       <div class="modal-actions">
         <button type="button" class="btn btn-ghost" @click="showPostModal = false" :disabled="isSubmittingPost">Annuler</button>
-        <button type="submit" class="btn btn-primary" :class="{'is-loading': isSubmittingPost}" :disabled="!newPost.skill_id || isSubmittingPost">Publier le post</button>
+        <button type="submit" class="btn btn-primary" :class="{'is-loading': isSubmittingPost}" :disabled="!newPost.skill_id || !newPost.availability_id || isSubmittingPost">Publier le post</button>
       </div>
     </form>
   </div>
@@ -673,7 +689,8 @@ const newPost = ref({
   description: '',
   type: 'offer',
   skill_id: '',
-  mode: 'online'
+  mode: 'online',
+  availability_id: ''
 })
 
 // Profile View
@@ -858,11 +875,21 @@ const handleAddAvailability = async () => {
 
 const submitPost = async () => {
   isSubmittingPost.value = true
-  const res = await store.createPost(newPost.value)
+
+  const postData = { ...newPost.value }
+  if (postData.availability_id) {
+    const av = store.user.availabilities.find(a => a.id === postData.availability_id)
+    if (av) {
+      postData.availabilities = [{ day_of_week: av.day_of_week, start_time: av.start_time, end_time: av.end_time }]
+    }
+    delete postData.availability_id
+  }
+
+  const res = await store.createPost(postData)
   isSubmittingPost.value = false
   if (res.success) {
     showPostModal.value = false
-    newPost.value = { description: '', type: 'offer', skill_id: '', mode: 'online' }
+    newPost.value = { description: '', type: 'offer', skill_id: '', mode: 'online', availability_id: '' }
   } else {
     alert(res.message)
   }
