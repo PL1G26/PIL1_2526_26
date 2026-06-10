@@ -11,6 +11,7 @@ uvicorn[standard]>=0.23.0
 # Database
 sqlalchemy>=2.0.30
 psycopg[binary]>=3.2
+psycopg2
 
 # Authentication & Security
 python-jose[cryptography]>=3.3.0
