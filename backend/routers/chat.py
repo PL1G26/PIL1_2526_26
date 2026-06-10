@@ -4,6 +4,7 @@
 # Endpoints: conversations, messages
 # ============================================================
 
+import asyncio
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -287,7 +288,28 @@ async def send_message(
     """)
     db.execute(update_conv, {"conversation_id": conversation_id})
     db.commit()
-    
+
+    # Notifier l'autre participant en temps réel (SSE)
+    other_user_id = (
+        conversation["mentee_id"]
+        if conversation["mentor_id"] == current_user.id
+        else conversation["mentor_id"]
+    )
+    try:
+        from routers.notifications import notify_user
+        asyncio.create_task(notify_user(other_user_id, {
+            "type": "new_message",
+            "conversation_id": msg_conv_id,
+            "message_id": msg_id,
+            "sender_id": msg_sender_id,
+            "sender_name": f"{current_user.first_name} {current_user.last_name}",
+            "sender_photo": current_user.profile_photo,
+            "content": msg_content,
+            "created_at": msg_created_at.isoformat() if hasattr(msg_created_at, 'isoformat') else str(msg_created_at),
+        }))
+    except Exception as e:
+        pass  # Ne pas bloquer l'envoi si la notification échoue
+
     return MessageResponse(
         id=msg_id,
         conversation_id=msg_conv_id,
@@ -381,6 +403,22 @@ async def send_direct_message(
     update_conv = text("UPDATE conversations SET updated_at = NOW() WHERE id = :conversation_id")
     db.execute(update_conv, {"conversation_id": conversation_id})
     db.commit()
+
+    # Notifier le destinataire en temps réel (SSE) pour les messages directs
+    try:
+        from routers.notifications import notify_user
+        asyncio.create_task(notify_user(request.target_user_id, {
+            "type": "new_message",
+            "conversation_id": msg_conv_id,
+            "message_id": msg_id,
+            "sender_id": msg_sender_id,
+            "sender_name": f"{current_user.first_name} {current_user.last_name}",
+            "sender_photo": current_user.profile_photo,
+            "content": msg_content,
+            "created_at": msg_created_at.isoformat() if hasattr(msg_created_at, 'isoformat') else str(msg_created_at),
+        }))
+    except Exception:
+        pass  # Ne pas bloquer si la notification SSE échoue
 
     return MessageResponse(
         id=msg_id,
