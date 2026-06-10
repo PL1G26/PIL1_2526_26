@@ -73,7 +73,7 @@ async def root():
     }
 
 # ──── ROUTER IMPORTS ──────────────────────────────────────────
-from routers import auth, chat, users, skills, posts, matches
+from routers import auth, chat, users, skills, posts, matches, notifications
 
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/api/users", tags=["Users"])
@@ -81,6 +81,7 @@ app.include_router(skills.router, prefix="/api/skills", tags=["Skills"])
 app.include_router(posts.router, prefix="/api/posts", tags=["Mentorship Posts"])
 app.include_router(matches.router, prefix="/api/matches", tags=["Matching"])
 app.include_router(chat.router, prefix="/api", tags=["Chat"])
+app.include_router(notifications.router, prefix="/api", tags=["Notifications"])
 
 # ──── EXCEPTION HANDLING ─────────────────────────────────────
 @app.exception_handler(Exception)
