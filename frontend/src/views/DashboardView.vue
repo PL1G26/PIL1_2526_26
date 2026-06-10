@@ -397,11 +397,14 @@
                 <img v-else :src="activeConversationPartner.profile_photo" style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;" @error="onPhotoError('chat-header')" />
                 <div class="chat-header-info">
                   <div class="chat-header-name">{{ activeConversationPartner.first_name }} {{ activeConversationPartner.last_name }}</div>
-                  <div class="chat-header-sub"><span class="chat-online-dot"></span>Conversation active</div>
+                  <div class="chat-header-sub">
+                    <span class="sse-status-dot" :class="sseConnected ? 'connected' : 'disconnected'"></span>
+                    {{ sseConnected ? 'Temps réel actif' : 'Reconnexion…' }}
+                  </div>
                 </div>
               </div>
               <!-- Messages -->
-              <div style="flex:1; overflow-y:auto; padding: 1rem;">
+              <div ref="messagesContainer" style="flex:1; overflow-y:auto; padding: 1rem;">
                 <div v-for="msg in activeConversationMessages" :key="msg.id" style="margin-bottom: 10px;">
                   <div :style="{textAlign: msg.sender_id === store.user.id ? 'right' : 'left'}">
                     <span style="background: var(--surface2); padding: 8px 12px; border-radius: 12px; display: inline-block;">
@@ -655,14 +658,37 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { store } from '../store'
+import notificationService from '../services/notificationService'
 
 const router = useRouter()
 
 // Sidebar mobile toggle
 const sidebarOpen = ref(false)
+
+// SSE connection status
+const sseConnected = ref(false)
+
+// Scroll to bottom ref
+const messagesContainer = ref(null)
+
+onMounted(() => {
+  // Mettre à jour l'état de connexion SSE
+  notificationService.start(store, () => {
+    sseConnected.value = true
+  })
+
+  // Écouter les événements custom pour l'état SSE
+  window.addEventListener('sse-connected', () => { sseConnected.value = true })
+  window.addEventListener('sse-disconnected', () => { sseConnected.value = false })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('sse-connected', () => {})
+  window.removeEventListener('sse-disconnected', () => {})
+})
 
 // Gestion des photos introuvables : stocke les clés d'images en erreur
 const brokenPhotos = reactive(new Set())
@@ -885,6 +911,14 @@ const activeConversationPartner = computed(() => {
 const totalUnreadMessages = computed(() => {
   return store.conversations.reduce((total, conv) => total + (conv.unread_count || 0), 0)
 })
+
+// Scroll automatique vers le bas quand de nouveaux messages arrivent
+watch(activeConversationMessages, async () => {
+  await nextTick()
+  if (messagesContainer.value) {
+    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+  }
+}, { deep: true })
 
 const formatDay = (dayEn) => {
   const map = {
