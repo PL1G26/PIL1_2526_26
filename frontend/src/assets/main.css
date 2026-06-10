@@ -699,6 +699,17 @@
   .match-detail-label { color: var(--text3); margin-bottom: 2px; }
   .match-detail-value { font-weight: 600; color: var(--text); }
   .match-actions { display: flex; gap: 8px; }
+  .match-user-card {
+    display: flex; flex-direction: column; gap: 4px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 10px 14px;
+    min-width: 170px;
+  }
+  .match-user-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--brand);
+    margin-bottom: 4px;
+  }
   .match-accepted-badge {
     background: var(--brand-light); color: var(--brand-dark);
     border: 1px solid var(--brand-mid);

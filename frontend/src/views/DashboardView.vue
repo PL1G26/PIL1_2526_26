@@ -16,8 +16,8 @@
   <div class="dashboard-layout">
     <aside class="sidebar">
       <div class="sidebar-user">
-        <div class="avatar av-green" v-if="!store.user?.profile_photo">{{ getInitials(store.user) }}</div>
-        <img v-else :src="store.user.profile_photo" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" />
+        <div class="avatar av-green" v-if="!photoOk('sidebar-user', store.user?.profile_photo)">{{ getInitials(store.user) }}</div>
+        <img v-else :src="store.user.profile_photo" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" @error="onPhotoError('sidebar-user')" />
         <div>
           <div class="sidebar-user-name">{{ store.user.first_name }} {{ store.user.last_name }}</div>
           <div class="sidebar-user-role">{{ store.user.field_of_study }} - {{ store.user.level }}</div>
@@ -46,7 +46,7 @@
         <button class="sidebar-item" :class="{active: store.activeTab === 'chat'}" @click="store.activeTab = 'chat'">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path></svg>
           Messagerie
-          <span class="badge-count" v-if="store.conversations.length > 0">{{ store.conversations.length }}</span>
+          <span class="badge-count" v-if="totalUnreadMessages > 0">{{ totalUnreadMessages }}</span>
         </button>
         <div class="sidebar-section-label">Explorer</div>
         <button class="sidebar-item" :class="{active: store.activeTab === 'explore'}" @click="store.activeTab = 'explore'">
@@ -135,8 +135,8 @@
             <div class="card-title">Informations personnelles</div>
             
             <div v-if="isEditingProfile" style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem;">
-              <div class="avatar av-green" v-if="!editProfileForm.profile_photo" style="width:60px; height:60px; font-size:24px; display:flex; align-items:center; justify-content:center;">{{ getInitials(store.user) }}</div>
-              <img v-else :src="editProfileForm.profile_photo" style="width:60px; height:60px; border-radius:50%; object-fit:cover;" />
+              <div class="avatar av-green" v-if="!photoOk('edit-profile', editProfileForm.profile_photo)" style="width:60px; height:60px; font-size:24px; display:flex; align-items:center; justify-content:center;">{{ getInitials(store.user) }}</div>
+              <img v-else :src="editProfileForm.profile_photo" style="width:60px; height:60px; border-radius:50%; object-fit:cover;" @error="onPhotoError('edit-profile')" />
               <div>
                 <label class="btn btn-outline btn-sm" style="cursor:pointer;">
                   Changer de photo
@@ -289,15 +289,27 @@
         </div>
         <div id="matches-list">
           <div v-if="pendingMatches.length === 0" style="padding:2rem;text-align:center;color:var(--text3);">Aucune correspondance en attente. Remplissez bien votre profil !</div>
-          <div class="card" v-for="match in pendingMatches" :key="match.id" style="margin-bottom: 1rem;">
-            <div style="display:flex; justify-content: space-between; align-items:center;">
-              <div>
-                <strong>Match ID: #{{ match.id }}</strong>
-                <div style="color: var(--text2)">Mentor: Utilisateur {{ match.mentor_id }}</div>
-                <div style="color: var(--text2)">Mentoré: Utilisateur {{ match.mentee_id }}</div>
-                <div style="color: var(--text2)">Compétence: {{ store.skills.find(s => s.id === match.skill_id)?.name }}</div>
+          <div class="card match-card" v-for="match in pendingMatches" :key="match.id" style="margin-bottom: 1rem;">
+            <div style="display:flex; justify-content: space-between; align-items:center; gap: 1rem;">
+              <div style="display:flex; gap: 1.5rem; flex:1; flex-wrap: wrap;">
+                <!-- Mentor -->
+                <div class="match-user-card">
+                  <div class="match-user-label">Mentor</div>
+                  <div style="display:flex; align-items:center; gap: 10px;">
+                    <div v-if="!photoOk('mentor-'+match.id, match.mentor?.profile_photo)" class="avatar av-green" style="width:38px;height:38px;font-size:15px;flex-shrink:0;">{{ (match.mentor?.first_name?.[0] || '') + (match.mentor?.last_name?.[0] || '') }}</div>
+                    <img v-else :src="match.mentor.profile_photo" style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;" @error="onPhotoError('mentor-'+match.id)" />
+                    <div>
+                      <div style="font-weight:600;font-size:14px;">{{ match.mentor?.first_name }} {{ match.mentor?.last_name }}</div>
+                      <div style="font-size:12px;color:var(--text3);">{{ match.mentor?.field_of_study }} · {{ match.mentor?.level }}</div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Compétence -->
+                <div style="display:flex;align-items:center;">
+                  <span class="tag tag-green" style="font-size:12px;">{{ match.skill?.name || store.skills.find(s => s.id === match.skill_id)?.name }}</span>
+                </div>
               </div>
-              <div style="text-align: right;">
+              <div style="text-align: right; flex-shrink:0;">
                 <div style="margin-bottom: 8px;">
                   <span class="tag tag-green">Score: {{ match.score }}%</span>
                 </div>
@@ -326,12 +338,21 @@
           <div class="conv-list" style="overflow-y:auto;">
             <div class="conv-list-header" style="display:flex;align-items:center;gap:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg> Conversations</div>
             <div v-if="store.conversations.length === 0" style="padding: 1rem; color: var(--text3); font-size: 13px;">Aucune conversation (acceptez un match d'abord).</div>
-            <div v-for="conv in store.conversations" :key="conv.id" 
+            <div v-for="conv in store.conversations" :key="conv.id"
                  @click="store.selectConversation(conv.id)"
-                 style="padding: 1rem; border-bottom: 1px solid var(--border); cursor: pointer;"
-                 :style="{background: store.activeConversationId === conv.id ? 'var(--surface2)' : 'transparent'}">
-              <strong>Conversation avec {{ conv.other_user?.first_name || 'Utilisateur' }}</strong>
-              <div style="font-size: 12px; color: var(--text3)">Match lié: #{{ conv.match_id }}</div>
+                 class="conv-item" :class="{active: store.activeConversationId === conv.id}">
+              <!-- Avatar -->
+              <div v-if="!photoOk('conv-'+conv.id, conv.other_user?.profile_photo)" class="avatar av-green" style="width:36px;height:36px;font-size:13px;flex-shrink:0;">
+                {{ (conv.other_user?.first_name?.[0] || '') + (conv.other_user?.last_name?.[0] || '') }}
+              </div>
+              <img v-else :src="conv.other_user.profile_photo" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" @error="onPhotoError('conv-'+conv.id)" />
+              <!-- Infos -->
+              <div class="conv-item-info">
+                <div class="conv-item-name">{{ conv.other_user?.first_name }} {{ conv.other_user?.last_name }}</div>
+                <div class="conv-item-preview">{{ conv.last_message?.content || 'Démarrer la conversation…' }}</div>
+              </div>
+              <!-- Badge non-lu -->
+              <div v-if="conv.unread_count > 0" class="unread-dot" :title="conv.unread_count + ' non lu(s)'"></div>
             </div>
           </div>
           <div class="chat-area" style="display:flex;flex-direction:column;overflow:hidden;">
@@ -340,6 +361,18 @@
               <h4>Sélectionne une conversation</h4>
             </div>
             <div v-else style="display:flex; flex-direction:column; height: 100%;">
+              <!-- En-tête de la conversation avec identité réelle -->
+              <div class="chat-header" v-if="activeConversationPartner">
+                <div v-if="!photoOk('chat-header', activeConversationPartner.profile_photo)" class="avatar av-green" style="width:38px;height:38px;font-size:14px;flex-shrink:0;">
+                  {{ (activeConversationPartner.first_name?.[0] || '') + (activeConversationPartner.last_name?.[0] || '') }}
+                </div>
+                <img v-else :src="activeConversationPartner.profile_photo" style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;" @error="onPhotoError('chat-header')" />
+                <div class="chat-header-info">
+                  <div class="chat-header-name">{{ activeConversationPartner.first_name }} {{ activeConversationPartner.last_name }}</div>
+                  <div class="chat-header-sub"><span class="chat-online-dot"></span>Conversation active</div>
+                </div>
+              </div>
+              <!-- Messages -->
               <div style="flex:1; overflow-y:auto; padding: 1rem;">
                 <div v-for="msg in activeConversationMessages" :key="msg.id" style="margin-bottom: 10px;">
                   <div :style="{textAlign: msg.sender_id === store.user.id ? 'right' : 'left'}">
@@ -350,6 +383,7 @@
                   </div>
                 </div>
               </div>
+              <!-- Zone de saisie -->
               <div style="padding: 1rem; border-top: 1px solid var(--border); display: flex; gap: 8px;">
                 <input v-model="chatInput" type="text" placeholder="Écrire un message..." style="flex: 1" @keyup.enter="sendChat" :disabled="isSendingMessage">
                 <button class="btn btn-primary" :class="{'is-loading': isSendingMessage}" :disabled="isSendingMessage" @click="sendChat">Envoyer</button>
@@ -420,20 +454,32 @@
         </div>
         <div id="history-matches-list">
           <div v-if="historyMatches.length === 0" style="padding:2rem;text-align:center;color:var(--text3);">Aucun historique disponible.</div>
-          <div class="card" v-for="match in historyMatches" :key="match.id" style="margin-bottom: 1rem; opacity: 0.8;">
-            <div style="display:flex; justify-content: space-between; align-items:center;">
-              <div>
-                <strong>Match ID: #{{ match.id }}</strong>
-                <div style="color: var(--text2)">Mentor: Utilisateur {{ match.mentor_id }}</div>
-                <div style="color: var(--text2)">Mentoré: Utilisateur {{ match.mentee_id }}</div>
-                <div style="color: var(--text2)">Compétence: {{ store.skills.find(s => s.id === match.skill_id)?.name }}</div>
-              </div>
-              <div style="text-align: right;">
-                <div style="margin-bottom: 8px;">
-                  <span class="tag" :class="{'tag-green': match.status === 'accepted', 'tag-red': match.status === 'rejected'}">Statut: {{ match.status }}</span>
-                  <span class="tag tag-green">Score: {{ match.score }}%</span>
+          <div class="card match-card" v-for="match in historyMatches" :key="match.id" style="margin-bottom: 1rem; opacity: 0.85;">
+            <div style="display:flex; justify-content: space-between; align-items:center; gap: 1rem;">
+              <div style="display:flex; gap: 1.5rem; flex:1; flex-wrap: wrap;">
+                <!-- Mentor -->
+                <div class="match-user-card">
+                  <div class="match-user-label">Mentor</div>
+                  <div style="display:flex; align-items:center; gap: 10px;">
+                    <div v-if="!photoOk('h-mentor-'+match.id, match.mentor?.profile_photo)" class="avatar av-green" style="width:38px;height:38px;font-size:15px;flex-shrink:0;">{{ (match.mentor?.first_name?.[0] || '') + (match.mentor?.last_name?.[0] || '') }}</div>
+                    <img v-else :src="match.mentor.profile_photo" style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;" @error="onPhotoError('h-mentor-'+match.id)" />
+                    <div>
+                      <div style="font-weight:600;font-size:14px;">{{ match.mentor?.first_name }} {{ match.mentor?.last_name }}</div>
+                      <div style="font-size:12px;color:var(--text3);">{{ match.mentor?.field_of_study }} · {{ match.mentor?.level }}</div>
+                    </div>
+                  </div>
                 </div>
-                <div style="font-size: 12px; color: var(--text3)">Terminé le {{ new Date(match.created_at).toLocaleDateString() }}</div>
+                <!-- Compétence -->
+                <div style="display:flex;align-items:center;">
+                  <span class="tag" style="font-size:12px;">{{ match.skill?.name || store.skills.find(s => s.id === match.skill_id)?.name }}</span>
+                </div>
+              </div>
+              <div style="text-align: right; flex-shrink:0;">
+                <div style="margin-bottom: 8px;">
+                  <span class="tag" :class="{'tag-green': match.status === 'accepted', 'tag-red': match.status === 'rejected'}">{{ match.status === 'accepted' ? 'Accepté' : 'Refusé' }}</span>
+                  <span class="tag tag-green" style="margin-left:4px;">Score: {{ match.score }}%</span>
+                </div>
+                <div style="font-size: 12px; color: var(--text3)">{{ new Date(match.created_at).toLocaleDateString() }}</div>
               </div>
             </div>
           </div>
@@ -492,8 +538,8 @@
       
       <div v-if="viewedProfile">
         <div style="margin-bottom: 1rem; padding: 1rem; background: var(--surface2); border-radius: var(--radius); display: flex; align-items: center; gap: 1rem;">
-          <div class="avatar av-green" v-if="!viewedProfile.profile_photo" style="width:50px; height:50px; font-size:20px; display:flex; align-items:center; justify-content:center;">{{ getInitials(viewedProfile) }}</div>
-          <img v-else :src="viewedProfile.profile_photo" style="width:50px; height:50px; border-radius:50%; object-fit:cover;" />
+          <div class="avatar av-green" v-if="!photoOk('viewed-profile', viewedProfile.profile_photo)" style="width:50px; height:50px; font-size:20px; display:flex; align-items:center; justify-content:center;">{{ getInitials(viewedProfile) }}</div>
+          <img v-else :src="viewedProfile.profile_photo" style="width:50px; height:50px; border-radius:50%; object-fit:cover;" @error="onPhotoError('viewed-profile')" />
           <div>
             <strong>{{ viewedProfile.first_name }} {{ viewedProfile.last_name }}</strong>
             <div style="color: var(--text2); font-size: 13px;">{{ viewedProfile.field_of_study }} - Niveau {{ viewedProfile.level }}</div>
@@ -539,11 +585,16 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { store } from '../store'
 
 const router = useRouter()
+
+// Gestion des photos introuvables : stocke les clés d'images en erreur
+const brokenPhotos = reactive(new Set())
+const onPhotoError = (key) => brokenPhotos.add(key)
+const photoOk = (key, url) => url && !brokenPhotos.has(key)
 
 // Profile Edit
 const isEditingProfile = ref(false)
@@ -708,7 +759,14 @@ const confirmSendDirectMessage = async () => {
 }
 
 const explorePosts = computed(() => {
-  return store.posts.filter(p => p.user_id !== store.user?.id)
+  return store.posts.filter(p => {
+    // Ne pas afficher ses propres posts
+    if (p.user_id === store.user?.id) return false
+    
+    // Ne pas afficher les posts des utilisateurs avec qui on a déjà une conversation
+    const hasConversation = store.conversations.some(c => c.other_user?.id === p.user_id)
+    return !hasConversation
+  })
 })
 
 const filteredExplorePosts = computed(() => {
@@ -742,6 +800,16 @@ const activeConversationMessages = computed(() => {
   if (!store.activeConversationId) return []
   const conv = store.conversations.find(c => c.id === store.activeConversationId)
   return conv?.messages || []
+})
+
+const activeConversationPartner = computed(() => {
+  if (!store.activeConversationId) return null
+  const conv = store.conversations.find(c => c.id === store.activeConversationId)
+  return conv?.other_user || null
+})
+
+const totalUnreadMessages = computed(() => {
+  return store.conversations.reduce((total, conv) => total + (conv.unread_count || 0), 0)
 })
 
 const formatDay = (dayEn) => {
@@ -812,8 +880,23 @@ const handleDeletePost = async (id) => {
 
 const handleAcceptMatch = async (id) => {
   matchActionLoading.value[id] = 'accept'
-  await store.acceptMatch(id)
+  const res = await store.acceptMatch(id)
   matchActionLoading.value[id] = null
+
+  if (res.success) {
+    // Recharger les données pour avoir la conversation créée
+    await store.fetchDashboardData()
+
+    // Trouver la conversation liée à ce match et l'ouvrir
+    const conv = store.conversations.find(c => c.match_id === id)
+    if (conv) {
+      await store.selectConversation(conv.id)
+      store.activeTab = 'chat'
+    } else {
+      // La conversation n'est pas encore visible, basculer quand même vers chat
+      store.activeTab = 'chat'
+    }
+  }
 }
 
 const handleRejectMatch = async (id) => {
