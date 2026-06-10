@@ -129,6 +129,18 @@ const loading = ref(false)
 const handleRegister = async () => {
   errorMessage.value = ''
   
+  const nameRegex = /^[A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s\-']*$/
+  if (!nameRegex.test(formData.value.first_name) || !nameRegex.test(formData.value.last_name)) {
+    errorMessage.value = "Le prénom et le nom doivent commencer par une lettre majuscule et ne doivent pas contenir de caractères spéciaux."
+    return
+  }
+
+  const phoneRegex = /^\+22901\d{8}$/
+  if (!phoneRegex.test(formData.value.phone_number.replace(/\s+/g, ''))) {
+    errorMessage.value = "Le numéro de téléphone doit être au format +22901XXXXXXXX."
+    return
+  }
+
   if (formData.value.password !== passwordConfirm.value) {
     errorMessage.value = "Les mots de passe ne correspondent pas."
     return
